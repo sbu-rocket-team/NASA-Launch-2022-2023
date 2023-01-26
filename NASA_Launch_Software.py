@@ -296,7 +296,7 @@ while (deployed and (not finishedTask)):
     print(tempCopy2)
     print()
 
-    # note... does A1 == a1???
+    # note...  does A1 == a1???
     matchingInstr1, DiffInstr1 = compareInstructions(eventList1_1, tempCopy1)
     matchingInstr2, DiffInstr2 = compareInstructions(eventList1_1, tempCopy2)
     
