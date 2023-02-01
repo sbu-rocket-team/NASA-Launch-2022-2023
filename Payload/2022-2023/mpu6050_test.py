@@ -26,7 +26,6 @@ def getAccelGyroMagVal():
     accelMag = np.linalg.norm(accelVec)
     gyroMag = np.linalg.norm(gyroVec)
 
-    
     print(str(accelMag) + ", " + str(gyroMag))
     #sleep(5/1000)
 
