@@ -14,8 +14,8 @@ import sys
 import time
 
 import numpy as np
-import cv2
-import matplotlib.pyplot as plt
+#import cv2
+#import matplotlib.pyplot as plt
 
 #eventList = ["C3", "B2", "B2", "F6", "C3", "F6", "C3", "F6", "C3", "D4", "A1", "C3"]
 #eventList1 = []
