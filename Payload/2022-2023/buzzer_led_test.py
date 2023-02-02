@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import pinout # Custom file of pinout definitons
+import  pinout # Custom file of pinout definitons
 from time import sleep
 import setupGPIO
 
