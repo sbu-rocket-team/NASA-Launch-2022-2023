@@ -1,12 +1,3 @@
-"""
-from mpu6050 import mpu6050
-from time import sleep #sleep([seconds]) used to pause ... arduino delay()
-
-MPU = mpu6050(0x68)
-"""
-
-
-
 import math
 import random
 import string
@@ -17,9 +8,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-#eventList = ["C3", "B2", "B2", "F6", "C3", "F6", "C3", "F6", "C3", "D4", "A1", "C3"]
-#eventList1 = []
-#eventList2 = []
+#from mpu6050 import mpu6050
 
 callSign = "KQ4CTL"
 matchingInstr = True
@@ -27,45 +16,194 @@ hasFlown = False
 deployed = False
 finishedTask = False
 
+#MPU = mpu6050(0x68)
+accelStart = None
+gryoStart = None
+
 #Arducam OV5642 Plus
 
-"""
+"""""
 MPU 6050
 https://www.youtube.com/watch?v=JTFa5l7zAA4
 https://github.com/m-rtijn/mpu6050
 https://pypi.org/project/mpu6050-raspberrypi/
 https://www.electronicwings.com/raspberry-pi/mpu6050-accelerometergyroscope-interfacing-with-raspberry-pi
 
+base on how itll be set up... if rocket is laying on the ground length-wise
+x ... towards sky
+y ... width of the rocket
+z ... length of the rocket
+"""
+
+"""
+Gets the magnitude of the acceleration and angular vectors.
+
+Returns:
+- accelMag [float?]: Magnitude of the acceleration vector
+- gyroMag [float?]: Magnitude of the angular vector
+"""
+
+# hsaoihdoiuahd
+"""
 def getAccelGyroMagVal():
-    accelVec = np.array(MPU.get_accel_data())
-    gyroVec = np.array(MPU.get_gyro_data())
+    mpu_accel = MPU.get_accel_data()
+    mpu_gyro = MPU.get_gyro_data()
+
+    accelVec = np.array([mpu_accel["x"], mpu_accel["y"], mpu_accel["z"]]) 
+    gyroVec = np.array([mpu_gyro["x"], mpu_gyro["y"], mpu_gyro["z"]]) 
     
     accelMag = np.linalg.norm(accelVec)
     gyroMag = np.linalg.norm(gyroVec)
 
-    print("Acceleration Vector")
-    print(accelVec)
-    print("Acceleration Mag")
-    print(accelMag)
+    return accelMag, gyroMag"""
 
-    print("Gyro Vector")
-    print(gyroVec)
-    print("Acceleration Vector")
-    print(gyroMag)
 """
-"""
-Gets the time that passed since start of program
+Gets the component velocities in 1 second intervals. Returns any combination of the three axis.
 
 Parameters:
-- timeStart: Start time of program
-- timeRef: Reference time to be obtained
+- xComp [Bool]: True if looking for x-component, default False
+- yComp [Bool]: True if looking for y-component, default False
+- zComp [Bool]: True if looking for z-component, default False
+
+Returns:
+- xVel [float?]: Average velocity in the x-direction
+- yVel [float?]: Average velocity in the y-direction
+- zVel [float?]: Average velocity in the z-direction
+"""
+# coiascjoiasd
+"""
+def getVel(xComp = False, yComp = False, zComp = False):
+    if (xComp and yComp and zComp):
+        timeRef1 = time.time()
+        xVal1 = MPU.get_accel_data()["x"]
+        yVal1 = MPU.get_accel_data()["y"]
+        zVal1 = MPU.get_accel_data()["z"]
+        time.sleep(1)
+        xVal2 = MPU.get_accel_data()["x"]
+        yVal2 = MPU.get_accel_data()["y"]
+        zVal2 = MPU.get_accel_data()["z"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        xValDif = xVal2 - xVal1
+        yValDif = yVal2 - yVal1
+        zValDif = zVal2 - zVal1
+
+        xVel = xValDif/timeRefDif
+        yVel = yValDif/timeRefDif
+        zVel = zValDif/timeRefDif
+
+        return xVel, yVel, zVel
+    elif (xComp and yComp):
+        timeRef1 = time.time()
+        xVal1 = MPU.get_accel_data()["x"]
+        yVal1 = MPU.get_accel_data()["y"]
+        time.sleep(1)
+        xVal2 = MPU.get_accel_data()["x"]
+        yVal2 = MPU.get_accel_data()["y"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        xValDif = xVal2 - xVal1
+        yValDif = yVal2 - yVal1
+        
+        xVel = xValDif/timeRefDif
+        yVel = yValDif/timeRefDif
+
+        return xVel, yVel
+    elif (xComp and zComp):
+        timeRef1 = time.time()
+        xVal1 = MPU.get_accel_data()["x"]
+        zVal1 = MPU.get_accel_data()["z"]
+        time.sleep(1)
+        xVal2 = MPU.get_accel_data()["x"]
+        zVal2 = MPU.get_accel_data()["z"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        xValDif = xVal2 - xVal1
+        zValDif = zVal2 - zVal1
+
+        xVel = xValDif/timeRefDif
+        zVel = zValDif/timeRefDif
+
+        return xVel, zVel
+    elif (yComp and zComp):
+        timeRef1 = time.time()
+        yVal1 = MPU.get_accel_data()["y"]
+        zVal1 = MPU.get_accel_data()["z"]
+        time.sleep(1)
+        yVal2 = MPU.get_accel_data()["y"]
+        zVal2 = MPU.get_accel_data()["z"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        yValDif = yVal2 - yVal1
+        zValDif = zVal2 - zVal1
+
+        yVel = yValDif/timeRefDif
+        zVel = zValDif/timeRefDif
+
+        return yVel, zVel
+    elif (xComp):
+        timeRef1 = time.time()
+        xVal1 = MPU.get_accel_data()["x"]
+        time.sleep(1)
+        xVal2 = MPU.get_accel_data()["x"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        xValDif = xVal2 - xVal1
+
+        xVel = xValDif/timeRefDif
+
+        return xVel
+    elif (yComp):
+        timeRef1 = time.time()
+        yVal1 = MPU.get_accel_data()["y"]
+        time.sleep(1)
+        yVal2 = MPU.get_accel_data()["y"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        yValDif = yVal2 - yVal1
+
+        yVel = yValDif/timeRefDif
+
+        return yVel
+    elif (zComp):
+        timeRef1 = time.time()
+        zVal1 = MPU.get_accel_data()["z"]
+        time.sleep(1)
+        zVal2 = MPU.get_accel_data()["z"]
+        timeRef2 = time.time()
+        
+        timeRefDif = timeRef2 - timeRef1
+        zValDif = zVal2 - zVal1
+
+        zVel = zValDif/timeRefDif
+
+        return zVel
+    else:
+        return None
+"""
+
+"""
+Gets the time that passed since start of program in hr:min:sec
+
+Parameters:
+- timeStart [float]: Start time of program //from time()
+- timeRef [float]: Reference time to be obtained
+
+Returns:
+- timeStr [String]: Time value in the format of "HH:MM:SS". Does not count the days.
 """
 def timeElapsed(timeStart, timeRef):
     timeDif = timeRef - timeStart
     
-    secs = int(timeRef) % 60
-    mins = int(timeRef / 60) % 60
-    hours = int(timeRef / (60*60)) % 24
+    secs = int(timeDif) % 60
+    mins = int(timeDif / 60) % 60
+    hours = int(timeDif / (60*60)) % 24
     
     timeStr = str(hours).zfill(2) + ":" + str(mins).zfill(2) + ":" + str(secs).zfill(2)
     
@@ -73,9 +211,6 @@ def timeElapsed(timeStart, timeRef):
 
 def getTransmittion():
     pass
-
-# XX4XXX C3 A1 D4 C3 F6 C3 F6 C3 F6 B2 B2 C3
-# insert to the front of list as we go down the instruction.
 
 """
 need to add in 
@@ -118,6 +253,7 @@ def getInstructionList(inString):
     return outList1, outList2
 
 """
+need to improve maybe do 3?
 # outputs the command with the most similarity
 # if first 2 are the same continue to perform task
 # if not the same, get signal again and compare again
@@ -137,6 +273,9 @@ def compareInstructions(inList1, inList2):
     return matching, differences
 
 # executes base on command ... need to make commands for each case
+"""
+Document
+"""
 def executeInstructions(instructionList):
     tempList = instructionList[:]
     listLen = len(tempList)
@@ -176,9 +315,12 @@ def executeInstructions(instructionList):
 Random team and instruction generator
 
 Parameters:
-- teams: number of teams, default of 1
-- length: number of instructions, default of 1
-- limit: types of instructions, default of 8
+- teams [int]: Number of teams, default of 1
+- length [int]: Number of instructions, default of 1
+- limit [int]: Types of instructions, default of 8
+
+Return:
+- Instr [String]: A string of commands with randomized teams and instructions
 """
 def genRandInstr(teams = 1, length = 1, limit = 8):
     reqTeam = "KQ4CTL"
@@ -230,8 +372,8 @@ def genRandInstr(teams = 1, length = 1, limit = 8):
 Creates random differences within the sequence
 
 Parameters:
-- inList: list of instructions
-- chance: chance (1 to 100) of change to occure per instruction, default of 10
+- inList [String List]: list of instructions
+- chance [int]: chance (1 to 100) of change to occure per instruction, default of 10
 """
 def createError(inList, chance = 10):
     for i in range(len(inList)):
@@ -258,15 +400,33 @@ def createError(inList, chance = 10):
             if (random.randint(1,100) <= 50):
                 inList[i] = inList[i].lower()
 
-#main tasks
-while (not hasFlown):
-    hasFlown = True
-    deployed = True
-    print("Passed 1")
-    print()
 
-while (deployed and (not finishedTask)):
-    instr1 = genRandInstr(1, 20)
+#main tasks
+
+#accelStart, gryoStart = getAccelGyroMagVal()
+accelMag1, gryoMag1 = 9.8, 0 # m/s2, *
+zVel1, zVel2= -15, -15 # m/s
+
+while (not (hasFlown & deployed)):
+    """
+    TODO: condition logic
+    """
+    if (not hasFlown):
+        if (zVel1 <= -15):
+            print("sleeping")
+            time.sleep(10)
+            if (zVel2 <= -15):
+                print("weeeeeeeeeeeeeeeeeeeeee")
+                hasFlown = True
+    else:
+        # need get stablize ranges
+        if (accelMag1 >= 8 and accelMag1 <= 10) and (gryoMag1 >= -1 and gryoMag1 <= 1):
+            print("Passed Deployment")
+            print()
+            deployed = True
+
+while (hasFlown and deployed and (not finishedTask)):
+    instr1 = genRandInstr(5, 20)
     
     print("Random instruction strings")
     print(instr1)
@@ -309,7 +469,7 @@ while (deployed and (not finishedTask)):
 
     print("\nExecuting Instructions...")
     executeInstructions(executeList)
-    print("Passed 2")
+    print("Passed Operation")
     finishedTask = True
 
     # what if record for 8 mins... get 3 readings
