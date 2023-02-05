@@ -74,7 +74,7 @@ Returns:
 """
 def getVel(xComp = False, yComp = False, zComp = False):
     if (xComp and yComp and zComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         xVal1 = MPU.get_accel_data()["x"]
         yVal1 = MPU.get_accel_data()["y"]
         zVal1 = MPU.get_accel_data()["z"]
@@ -82,7 +82,7 @@ def getVel(xComp = False, yComp = False, zComp = False):
         xVal2 = MPU.get_accel_data()["x"]
         yVal2 = MPU.get_accel_data()["y"]
         zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         xValDif = xVal2 - xVal1
@@ -95,13 +95,13 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return xVel, yVel, zVel
     elif (xComp and yComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         xVal1 = MPU.get_accel_data()["x"]
         yVal1 = MPU.get_accel_data()["y"]
         time.sleep(1)
         xVal2 = MPU.get_accel_data()["x"]
         yVal2 = MPU.get_accel_data()["y"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         xValDif = xVal2 - xVal1
@@ -112,13 +112,13 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return xVel, yVel
     elif (xComp and zComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         xVal1 = MPU.get_accel_data()["x"]
         zVal1 = MPU.get_accel_data()["z"]
         time.sleep(1)
         xVal2 = MPU.get_accel_data()["x"]
         zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         xValDif = xVal2 - xVal1
@@ -129,13 +129,13 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return xVel, zVel
     elif (yComp and zComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         yVal1 = MPU.get_accel_data()["y"]
         zVal1 = MPU.get_accel_data()["z"]
         time.sleep(1)
         yVal2 = MPU.get_accel_data()["y"]
         zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         yValDif = yVal2 - yVal1
@@ -146,11 +146,11 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return yVel, zVel
     elif (xComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         xVal1 = MPU.get_accel_data()["x"]
         time.sleep(1)
         xVal2 = MPU.get_accel_data()["x"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         xValDif = xVal2 - xVal1
@@ -159,11 +159,11 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return xVel
     elif (yComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         yVal1 = MPU.get_accel_data()["y"]
         time.sleep(1)
         yVal2 = MPU.get_accel_data()["y"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         yValDif = yVal2 - yVal1
@@ -172,11 +172,11 @@ def getVel(xComp = False, yComp = False, zComp = False):
 
         return yVel
     elif (zComp):
-        timeRef1 = time.time()
+        timeRef1 = time.perf_counter()
         zVal1 = MPU.get_accel_data()["z"]
         time.sleep(1)
         zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.time()
+        timeRef2 = time.perf_counter()
         
         timeRefDif = timeRef2 - timeRef1
         zValDif = zVal2 - zVal1
