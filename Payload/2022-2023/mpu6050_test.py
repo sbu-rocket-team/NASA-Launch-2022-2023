@@ -29,6 +29,15 @@ def getAccelGyroMagVal():
     print(str(accelMag) + ", " + str(gyroMag))
     #sleep(5/1000)
 
+    #print("Acceleration Vector")
+    #print(accelVec)
+    #print("Acceleration Mag")
+    #print(accelMag)
+
+    #print("Gyro Vector")
+    #print(gyroVec)
+    #print("Acceleration Vector")
+    #print(gyroMag)
 
 i = 0
 while i < 100:
