@@ -1,52 +1,78 @@
 import time
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(5, GPIO.IN)
-GPIO.setup(6, GPIO.IN)
+import random
+
+encoderA = 5 # pin of hall effect A
+encoderB = 6 # pin of hall effect B
+
+"""GPIO.setmode(GPIO.BOARD)
+GPIO.setup(encoderA, GPIO.IN)
+GPIO.setup(encoderB, GPIO.IN)
 GPIO.setup(7, GPIO.OUT) # motor control GPIO pin
+"""
+counter = 0 # position/counter
+reqCounter = 0 # wanted counter to hit wanted degree
 
-counts_per_rotation = 12
-position = 0
-gear_ratio = 298
+cpr = 12 # counts per rotation
+mgr = 298 # motor gear ratio, 298:1
+cgr = 86 / 20 # camera spur/bevel gear ratio, x:xx
 
-speeds = []
-times = []
+mpr = cpr * mgr *cgr # total counter per output rotation
+degree = 360
 
-def read_drv5013(channel):
-    global position
-    if channel == 5:
+cpd = mpr / degree # counts per degree
+dpc = degree / mpr # degrees per count
+
+"""def readEncoder(pin):
+    global counter
+    if pin == 5:
         if GPIO.input(5) == GPIO.HIGH:
             if GPIO.input(6) == GPIO.LOW:
-                position += 1
+                counter += 1
             else:
-                position -= 1
-    return position / counts_per_rotation
+                counter -= 1
+    return counter"""
 
-GPIO.add_event_detect(5, GPIO.RISING, callback=read_drv5013)
+def virtualEncoder():
+    global counter
 
-start_time = time.time()
+    if (random.randint(0,10) > 1):
+        counter += 1
+    else:
+        counter -= 1
 
-degree_of_rotation = 90 # desired degree of rotation
-desired_position = degree_of_rotation * (counts_per_rotation / 360) * gear_ratio
+"""
 
-GPIO.output(7, GPIO.HIGH) # start the motor
+Parameters:
+- direction [int]: 0 = right, 1 = left
+"""
+def rotateCam(direction, degree = 60):
+    global cpd
+    global counter
+    global reqCounter
 
-while True:
-    elapsed_time = time.time() - start_time
-    rotations_per_second = (position / counts_per_rotation) / elapsed_time
-    speed = rotations_per_second / gear_ratio
-    speeds.append(speed)
-    times.append(elapsed_time)
-    if position >= desired_position:
-        break
-    time.sleep(0.1)
+    counter = 0 # reset counter from previous runs
+    reqCounter = round(degree * cpd)
+    print(reqCounter)
 
-GPIO.output(7, GPIO.LOW) # stop the motor
+    if (direction == 0):
+        # turn on motor that turns right
+        print("motor on, turning right")
+        pass
+    elif (direction == 1):
+        # turn on motor that turns left
+        print("motor off, turning left")
+        pass
+    
+    while (counter < reqCounter):
+        #GPIO.add_event_detect(encoderA, GPIO.RISING, callback=readEncoder)
+        virtualEncoder()
+        print(counter)
+        time.sleep(0.1)
+    
+    # turn off motor
+    print("motor off")
 
-plt.plot(times, speeds)
-plt.xlabel("Time (s)")
-plt.ylabel("Speed (RPM)")
-plt.title("Motor Speed Over Time")
-plt.show()
+rotateCam(0, 10)

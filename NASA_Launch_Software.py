@@ -1,27 +1,53 @@
+"""
+Group: SBU Rocket Team
+
+Written By: Jewick Shi
+Edited By: Ethan Carr
+"""
+
 import math
 import random
 import string
-import sys
 import time
 
-import numpy as np
 import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 
 #from mpu6050 import mpu6050
+#import RPi.GPIO as GPIO
+#import picamera
+
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+
+TEXTFONT = cv2.FONT_HERSHEY_DUPLEX
+TEXTLINE = cv2.LINE_AA
 
 callSign = "KQ4CTL"
 matchingInstr = True
 hasFlown = False
 deployed = False
 finishedTask = False
+isGreyscale = False
+isCustomFilter = False
+flipPic = False
+
+flipCounter = 0
+fallVel = -5
+
+#imgFile = None
+imgFile = 'field.jpg'
+
+# arducam imx477 B0262
+# https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/
+# https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/PiCamera2-User-Guide/
 
 #MPU = mpu6050(0x68)
 accelStart = None
 gryoStart = None
 
-#Arducam OV5642 Plus
-
+#mpu stuff
 """""
 MPU 6050
 https://www.youtube.com/watch?v=JTFa5l7zAA4
@@ -213,6 +239,144 @@ def getTransmittion():
     pass
 
 """
+Changes the brightness and stauration of an image. The multiplier is applied before the addends.
+
+Parameters:
+- img [Array*]: Image to be filtered, color format assumed to be BGR
+- lightMul [float]: Multiplicative increase of each pixel luminosity, default value of 1
+                    [0,1] ... [darker, lighter]
+- lightAdd [int]: Additive increase of each pixel luminosity, default value of 0
+                  [0,255] ... [darker, lighter]
+- lightMul [float]: Multiplicative increase of each pixel saturation, default value of 1
+                    [0,1] ... [greyscale, colored]
+- lightAdd [int]: Additive increase of each pixel saturation, default value of 0
+                  [0,255] ... [greyscale, colored] color
+
+Returns:
+- imgfiltered [Array*]: Image filitered base on user parameter
+"""
+def filterLightSat(img, satMul = 1, satAdd = 0, lightMul = 1, lightAdd = 0):
+  imghls = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
+  h, l, s = cv2.split(imghls)
+
+  s = np.array(s.astype('float32'))
+  #s = (s + satAdd) * satMul
+  s = (s * satMul) + satAdd
+  s = np.clip(s, 0, 255).astype('uint8')
+
+  l = np.array(l.astype('float32'))
+  #l = (l + lightAdd) * lightMul
+  l = (l * lightMul) + lightAdd
+  l = np.clip(l, 0, 255).astype('uint8')
+
+  imgfiltered = cv2.cvtColor(cv2.merge([h, l, s]), cv2.COLOR_HLS2BGR)
+
+  return imgfiltered
+
+"""
+DOCUMENT
+"""
+def fourFilters(img):
+  imgSize = img.shape
+  imgY, imgX = imgSize[0], imgSize[1]
+
+  imgYHalf = imgY // 2
+  imgXHalf = imgX // 2
+  imgYQ1 = imgY // 4
+  imgXQ1 = imgX // 4
+  imgYQ2 = (imgY // 4) * 3
+  imgXQ2 = (imgX // 4) * 3
+
+
+  imgTL = img[:imgYHalf, :imgXHalf]
+  imgBL = img[(imgYHalf+1):, :imgXHalf]
+  imgTR = img[:imgYHalf, (imgXHalf+1):]
+  imgBR = img[(imgYHalf+1):, (imgXHalf+1):]
+  imgC = img[imgYQ1:imgYQ2, imgXQ1:imgXQ2]
+
+  imgTL = filterLightSat(imgTL, satMul= 1, satAdd= 255, lightMul=2)
+  imgBL = cv2.bitwise_not((filterLightSat(imgBL, satMul= 1, satAdd= 255, lightMul=2)))
+
+  imgTR = cv2.cvtColor(cv2.cvtColor(imgTR, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+  imgBR = cv2.cvtColor(cv2.cvtColor(imgBR, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+
+  imgTR = filterLightSat(imgTR, satMul= 1, satAdd= 255, lightMul=2)
+  imgBR = cv2.bitwise_not((filterLightSat(imgBR, satMul= 1, satAdd= 255, lightMul=2)))
+
+
+  imgT = cv2.hconcat([imgTL, imgTR])
+  imgB = cv2.hconcat([imgBL, imgBR])
+
+  imgComb = cv2.vconcat([imgT, imgB])
+  imgComb[imgYQ1:imgYQ2, imgXQ1:imgXQ2] = imgC
+  imgComb = cv2.flip(imgComb, 0)
+
+  return imgComb
+
+"""
+Stamps the relative time and type of filter used on the image
+
+Parameters:
+- img [Array*]: Image that will be modified
+- time [String]: The time value that will be stamped
+- filterText [String]: Description of filter that was used
+
+Returns:
+- imgStamp [Array*]: Image stamped with time and filter values
+"""
+def stampImg(img, timeStamp, filterText):
+  imgSize = img.shape
+  imgY, imgX = imgSize[0], imgSize[1]
+
+  textScale = 0.5e-3 * min(imgY, imgX)
+  #textThick = math.ceil(1e-3 * min(imgY, imgX))
+  textThick = 1
+
+  textBoxStart = (0, imgY)
+  dateLocation = (int(0.005 * imgX), int(0.97 * imgY))
+  textLocation = (int(0.005*imgX), int(0.99*imgY))
+
+  (labelX, labelY), baseline = cv2.getTextSize(filterText, TEXTFONT, textScale, textThick)
+  textBoxEnd = (int(labelX + (0.01*imgX)), int(0.95*imgY))
+
+  cv2.rectangle(img, textBoxStart, textBoxEnd, BLACK, -1)
+  cv2.putText(img, filterText, textLocation, TEXTFONT, textScale, WHITE, textThick, TEXTLINE)
+  cv2.putText(img, timeStamp, dateLocation, TEXTFONT, textScale, WHITE, textThick, TEXTLINE)
+
+  return img
+
+"""
+show image
+"""
+def showIMG(img, timeStamp, greyScale, custFil, flip):
+    filText = ""
+
+    if (not (greyScale or custFil)):
+        filText += "No Filter "
+    if (custFil and (not (greyScale and flip))):
+        img = fourFilters(img)
+        filText += "No Filter, Saturated/Brighten, Greyscale, Inverted, Flipped"
+    elif (custFil and (not greyScale)):
+        img = fourFilters(img)
+        filText += "Saturated/Brighten, Greyscale, Inverted, Flipped"
+    elif (custFil and (not flip)):
+        img = fourFilters(img)
+        filText += "No Filter, Saturated/Brighten, Greyscale, Inverted"
+    if (greyScale):
+        img = cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+        filText += "Greyscale "
+    if (flip):
+        img = cv2.flip(img, 0)
+        filText += "Flipped "
+    
+    img = stampImg(img, timeStamp, filText)
+
+    plt.figure(1)
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    plt.axis("off")
+    plt.show()
+
+"""
 need to add in 
 gets 2 instructions out of the radio signal...
 6 mins record to guarntee at least 2 readings... best case 3 full proper, avg case 2 full 1 partial
@@ -277,8 +441,18 @@ def compareInstructions(inList1, inList2):
 Document
 """
 def executeInstructions(instructionList):
+    global timeOn
+    global isGreyscale
+    global isCustomFilter
+    global flipCounter
+    global flipPic
+    global imgFile
+
+    img = None
+
     tempList = instructionList[:]
     listLen = len(tempList)
+    timeTaken = None
 
     while listLen > 0:
         instrCase = tempList.pop()
@@ -286,29 +460,48 @@ def executeInstructions(instructionList):
         match instrCase:
             case "A1":
                 # Turn 60* right
-                print("apple")
+                print("A1 turn 60* right," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "B2":
                 # Turn 60* left
-                print("banana")
+                print("B2 turn 60* left," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "C3":
                 # Take picture
-                print("cake")
+
+                # imgFile = asihuidlaihdsafh
+                img = cv2.imread(imgFile, cv2.IMREAD_ANYCOLOR)
+                timeTaken = timeElapsed(timeOn, time.time())
+                showIMG(img, timeTaken, isGreyscale, isCustomFilter, flipPic)
+
+                # showImg()...
+                print("C3 take pic," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "D4":
                 # Color to Greyscale
-                print("duck")
+                isGreyscale = True
+                print("D4 to greyscale," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "E5":
                 # Greyscale to Color
-                print("eel")
+                isGreyscale = False
+                print("E5 to color," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "F6":
                 # Rotate 180* ... flip upside down
-                print("fruit")
+                flipCounter += 1
+                if (flipCounter % 2 == 1):
+                    flipPic = True
+                elif (flipCounter % 2 == 0):
+                    flipPic = False
+                print("F6 rotate 180*," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "G7":
                 # Apply chosen filters
-                print("gg ez")
+                isCustomFilter = True
+                print("G7 custom filter," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
             case "H8":
                 # Remove all filters
-                print("Henry VIII")
-
+                isGreyscale = False
+                isCustomFilter = False
+                flipPic = False # I'm assuming this is condsidered a filter?
+                print("H8 remove filters," + " " + str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
+        
+        print(timeTaken)
         listLen = len(tempList)
 
 """
@@ -401,31 +594,43 @@ def createError(inList, chance = 10):
                 inList[i] = inList[i].lower()
 
 
-#main tasks
 
-#accelStart, gryoStart = getAccelGyroMagVal()
-accelMag1, gryoMag1 = 9.8, 0 # m/s2, *
+#main tasks
+accelMag, gryoMag = 9.8, 0 # m/s2, *
 zVel1, zVel2= -15, -15 # m/s
+
+timeOn = time.time()
 
 while (not (hasFlown & deployed)):
     """
     TODO: condition logic
     """
     if (not hasFlown):
-        if (zVel1 <= -15):
-            print("sleeping")
-            time.sleep(10)
-            if (zVel2 <= -15):
+        #zVel1 = getVel(zComp= True)
+        if (zVel1 <= fallVel):
+            print("waiting to see if stil falling")
+            #zVel2 = getVel(zComp= True)
+            time.sleep(2)
+            if (zVel2 <= fallVel):
                 print("weeeeeeeeeeeeeeeeeeeeee")
                 hasFlown = True
     else:
         # need get stablize ranges
-        if (accelMag1 >= 8 and accelMag1 <= 10) and (gryoMag1 >= -1 and gryoMag1 <= 1):
+        #accelMag, gryoMag = getAccelGyroMagVal()
+        # might need a resting variable to beeter change
+        if (accelMag >= 8 and accelMag <= 10) and (gryoMag >= -1 and gryoMag <= 1):
             print("Passed Deployment")
             print()
+
+            # open payload
+            # lift camera
             deployed = True
 
 while (hasFlown and deployed and (not finishedTask)):
+    # get radio signal... read from txt file hopefully
+    # parse signal
+    # execute signal 
+    # call it a day
     instr1 = genRandInstr(5, 20)
     
     print("Random instruction strings")
@@ -468,8 +673,9 @@ while (hasFlown and deployed and (not finishedTask)):
         executeList = tempCopy2
 
     print("\nExecuting Instructions...")
+    print("what, grey? custom? flipped?")
     executeInstructions(executeList)
-    print("Passed Operation")
+    print("\nPassed Operation")
     finishedTask = True
 
     # what if record for 8 mins... get 3 readings
