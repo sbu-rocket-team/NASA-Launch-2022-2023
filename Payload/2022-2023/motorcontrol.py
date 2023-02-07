@@ -2,24 +2,11 @@
 # Code written by Jewick, edited by EC.
 import RPi.GPIO as GPIO
 from time import sleep
-
-def getpins(args):
-    if len(args) == 1:
-        pins = args[0]    
-    elif len(args) == 2:
-        pins = [args[0], args[1]]
-
-    return pins
-
-def run_test(*args):
-    pins = getpins(*args)            
+     
 def run_test(enable, phase):
     pins = [enable, phase]            
     GPIO.output(pins, GPIO.HIGH)
-
-
-def off(*args):
-    pins = getpins(*args)       
+  
 def off(enable, phase):
     pins = [enable, phase]          
 
@@ -35,14 +22,10 @@ def pwm_on(pin, duty, start, end, step, time):
         sleep(time/((end-start)/step))
 
 
-def run_smoothstart(*args):
-    pins = getpins(*args)    
-
-    enable = pins[0] # PWM Control
-    phase = pins[1]
 def run_smoothstart(enable, phase):
 
     pwm_on(enable,120,50,100,5,2)
+
 
 def run_backforth(enable, phase):
 
@@ -56,7 +39,6 @@ def run_backforth(enable, phase):
 
 '''
 Motor Logic: Using PHASE/ENABLE mode
-phase LOW, ENABLE
 phase LOW, enable HIGH (PWM) --> Forward, speed at pwm%
 phase HIGH, enable HIGH (PWM) --> Reverse, speed at pwm%
 '''
