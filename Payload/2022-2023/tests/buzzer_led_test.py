@@ -1,9 +1,9 @@
 import RPi.GPIO as GPIO
-import pinout # Custom file of pinout definitons
+import  pinout # Custom file of pinout definitons
 from time import sleep
-import setupGPIO
+import setup_gpio
 
-setupGPIO.setup()
+setup_gpio.setup()
 
 def buzzbeep(rep):
     for i in range(rep):
