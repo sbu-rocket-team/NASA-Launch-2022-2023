@@ -2,6 +2,7 @@ import pinout
 import RPi.GPIO as GPIO
 
 # Dont know if i need to initialize any SPI or I2C stuff?
+# xian zai wo yo bing chilling!
 def setup():
     GPIO.setmode(GPIO.BOARD) # Sets pinout to BCM
     GPIO.setwarnings(False)
