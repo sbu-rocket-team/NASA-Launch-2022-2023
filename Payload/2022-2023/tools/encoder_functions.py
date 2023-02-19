@@ -54,7 +54,7 @@ Parameters:
 # make so it doesn't try to choke itself
 def rotateCam(direction, degree = 60):
     print("Rotating", direction, degree)
-    degree = degree % 360'=
+    degree = degree % 360
     print("Actual rotation:", degree)
 
     global CPD
