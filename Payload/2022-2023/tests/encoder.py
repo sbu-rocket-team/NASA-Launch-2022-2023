@@ -1,9 +1,9 @@
 import time
 
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-#import motorControl as mc
+import motorControl as mc
 
 import random
 
@@ -17,29 +17,28 @@ GPIO.setup(7, GPIO.OUT) # motor control GPIO pin
 
 """https://www.pololu.com/product/4761"""
 
-savedDegree = 0 # basically savedCounter ... -240 to 240, postive to the right
-counter = 0 # position/counter
-reqCounter = 0 # wanted counter to reach desire degree
 MAXROT = 240 # either directions
 
-CPR = 12 # counts per rotation
-MGR = (25 * 34 * 37 * 35 * 38) / (12 * 9 * 10 * 13 * 10)
+CPR = 6 # counts per rotation for 2 hall effects, halved if only 1... encoder used is 12 cpr
+MGR = (25 * 34 * 37 * 35 * 38) / (12 * 9 * 10 * 13 * 10) # actual motor gearbox ratio
 CGR = 86 / 20 # camera spur/bevel gear ratio, x:xx
 
 MPR = round(CPR * MGR * CGR) # total counter per output rotation
 
 CPD = MPR / 360 # counts per degree
-dpc = 360 / MPR # degrees per count
 
-"""def readEncoder(pin):
+savedDegree = 0 # basically savedCounter ... -240 to 240, postive to the right
+counter = 0 # position/counter
+reqCounter = 0 # wanted counter to reach desire degree
+
+def readEncoder(pin):
     global counter
     if pin == 5:
         if GPIO.input(5) == GPIO.HIGH:
-            if GPIO.input(6) == GPIO.LOW:
-                counter += 1
-            else:
-                counter -= 1
-    return counter"""
+            counter += 1
+        else:
+            counter -= 1
+    return counter
 
 def virtualEncoder():
     global counter
@@ -54,7 +53,7 @@ Parameters:
 # make so it doesn't try to choke itself
 def rotateCam(direction, degree = 60):
     print("Rotating", direction, degree)
-    degree = degree % 360'=
+    degree = degree % 360
     print("Actual rotation:", degree)
 
     global CPD

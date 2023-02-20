@@ -15,10 +15,11 @@ motorPinMLift = None
 motorPinMRot = None
 
 # as tuples just to reudce .setup lines
-pinList = [enablePinD, enablePinMLift, enablePinMRot, motorPinD, motorPinMLift, motorPinMRot]
 pinDList = [enablePinD, motorPinD]
 pinMLList = [enablePinMLift, motorPinMLift]
-pinMRList = []
+pinMRList = [enablePinMRot, motorPinMRot]
+
+pinList = [pinDList, pinMLList, pinMRList]
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pinList, GPIO.OUT)
@@ -37,6 +38,15 @@ xIN2 = Enable pin = Speed
 
 """
 
+"""
+
+Parameters:
+- pPin [int]: Phase pin (actually enable) to turn the motor on/off
+- ePin [int]: Enable pin (actually phase) to control the speed of the motor
+- direction [char]: "F" or "B" for forward/right or backwards/left relatively
+- intSped [int]: Starting speed of the motor, if no endSpd is specified is also the settled speed
+- endSped [int]: Settling speed of the motor, 
+"""
 def motorON(pPin, ePin, direction, intSpd, endSpd = -1):
     global FREQ
     eSpeed = intSpd
@@ -53,13 +63,28 @@ def motorON(pPin, ePin, direction, intSpd, endSpd = -1):
         GPIO.output(pPin, 1)
         pwm = GPIO.PWM(ePin, FREQ)
         pwm.start(eSpeed)
-    rampUp(pwm, intSpd, endSpd)
+    rampSpd(pwm, intSpd, endSpd)
 
 def mtorOff(ePin):
     GPIO.output(ePin, 0)
 
-def rampUp(pwm, startSpd, endSpd):
-    for i in range(startSpd, endSpd, 5):
+def rampSpd(pwm, startSpd, endSpd):
+    if (endSpd > 100):
+        endSpd = 100
+
+    if (endSpd != -1):
+        if (endSpd > startSpd):
+            interval = round((endSpd - startSpd) / 9)
+        else:
+            interval = round((startSpd - endSpd) / 9)
+
+    startSpd += interval
+    endSpd += interval        
+
+    for i in range(startSpd, endSpd, interval):
+        if (i > 100):
+            pwm.ChangeDutyCycle(100)
+            break
         pwm.ChangeDutyCycle(i)
         time.sleep(0.5)
 

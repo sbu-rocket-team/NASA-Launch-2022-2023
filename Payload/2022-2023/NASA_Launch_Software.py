@@ -12,10 +12,14 @@ import cv2
 import matplotlib.pyplot as plt
 
 import radioSim as rS   # remove from final product
+#import camFunct as camF
 #import mpuFunct as mpuF
+#import motorFunct as mF
+#import encoderFunct as eF
 import instructFunct as instF
 import imgFunct as imgF
 import miscFunct as miscF
+import txtFunct as txtF
 
 
 #import RPi.GPIO as GPIO
@@ -39,11 +43,13 @@ relCamRot = 0
 # https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/
 # https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/PiCamera2-User-Guide/
 
+RADIOTEXT = "pie.txt"
+
 #imgFile = None
-imgName = "field.jpg"
+IMGNAME = "field.jpg"
 script_dir = os.path.dirname(os.path.abspath(__file__))
 img_dir = os.path.join(script_dir, "TestImages")
-imgFile = os.path.join(img_dir, imgName)
+imgFile = os.path.join(img_dir, IMGNAME)
 
 accelStart = None
 gryoStart = None
@@ -169,8 +175,10 @@ while (hasFlown and deployed and (not finishedTask)):
     # parse signal
     # execute signal 
     # call it a day
-    instr1 = rS.genRandInstr(5, 20)
     
+    #instr1 = rS.genRandInstr(5, 20)
+    instr1 = txtF.readFile(RADIOTEXT)
+
     print("Random instruction strings")
     print(instr1)
     print()

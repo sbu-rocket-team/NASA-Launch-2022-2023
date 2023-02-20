@@ -29,6 +29,7 @@ def writeFile(fileName, *fileText):
     file.close()
 
 
-readeded = readFile(readName)
+#readeded = readFile(readName)
+readeded = readFile("pizza.txt")
 print(readeded)
-writeFile(wrtieName, txt1, txtnum1, txtnum2, txtnum3)
+#writeFile(wrtieName, txt1, txtnum1, txtnum2, txtnum3)
