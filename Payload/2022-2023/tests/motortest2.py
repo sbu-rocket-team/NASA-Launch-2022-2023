@@ -1,7 +1,6 @@
-import pinout
-import setup_gpio
-import motorcontrol as mc
+from tools import pinout, setup_gpio, motor_functions as mc
 from time import sleep
+
 setup_gpio.setup()
 
 rot = [pinout.ROT_ENABLE, pinout.ROT_PHASE]

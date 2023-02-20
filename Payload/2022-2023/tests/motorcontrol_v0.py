@@ -10,16 +10,12 @@ def getpins(args):
         pins = [args[0], args[1]]
 
     return pins
-
-def run_test(*args):
-    pins = getpins(*args)            
+       
 def run_test(enable, phase):
     pins = [enable, phase]            
     GPIO.output(pins, GPIO.HIGH)
 
-
-def off(*args):
-    pins = getpins(*args)       
+     
 def off(enable, phase):
     pins = [enable, phase]          
 
@@ -35,11 +31,6 @@ def pwm_on(pin, duty, start, end, step, time):
         sleep(time/((end-start)/step))
 
 
-def run_smoothstart(*args):
-    pins = getpins(*args)    
-
-    enable = pins[0] # PWM Control
-    phase = pins[1]
 def run_smoothstart(enable, phase):
 
     pwm_on(enable,120,50,100,5,2)

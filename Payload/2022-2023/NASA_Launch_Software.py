@@ -11,6 +11,7 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 
+<<<<<<< HEAD
 import radioSim as rS   # remove from final product
 #import camFunct as camF
 #import mpuFunct as mpuF
@@ -20,9 +21,12 @@ import instructFunct as instF
 import imgFunct as imgF
 import miscFunct as miscF
 import txtFunct as txtF
+=======
+from tools import radio_simulator as rS, instruction_functions as instF, img_functions as imgF, misc_functions as miscF, mpu_functions as mpuF
+>>>>>>> e6f35517bc417bb0a3a08fedad94116cdab85b59
 
 
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 #import picamera
 
 CALLSIGN = "KQ4CTL"

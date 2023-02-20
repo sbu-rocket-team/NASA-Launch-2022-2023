@@ -20,3 +20,6 @@ def setup():
 
     GPIO.setup(pinout.ENCODER, GPIO.IN)
     GPIO.setup(pinout.RP_LIM, GPIO.IN)
+
+def cleanup():
+    GPIO.cleanup()

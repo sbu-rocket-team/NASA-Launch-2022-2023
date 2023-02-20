@@ -1,0 +1,29 @@
+fft_size = 512;
+devices: (
+  {
+    type = "rtlsdr";
+    index = 0;
+    sample_rate = 1;
+    centerfreq = 106100000;
+    correction = 0;
+    channels:
+    (
+      {
+        freq = 106.1;
+        modulation = "nfm";
+        #bandwidth = 30000;
+        outputs: (
+          {
+            type = "file";
+            directory = "/home/pi";
+            filename_template = "recording";
+            continuous = true;
+        #   split_on_transmission = false;
+        #   include_freq = false;
+        #   append = true;
+          }
+        );
+      }
+    );
+  }
+);
