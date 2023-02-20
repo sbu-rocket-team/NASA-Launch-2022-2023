@@ -13,7 +13,7 @@ flipPic = False
 imgFile = "test.jpg"
 
 pcam = pc2()
-pcam_config = pcam.still_configuration(main={"size": (1920, 1080)}, display=None)
+pcam_config = pcam.create_still_configuration(main={"size": (1920, 1080)})
 pcam.configure(pcam_config)
 #pcam.set_controls({"AfMode": lc.controls.AfModeEnum.Continuous}) # is autofocus needed ... not supported on cam
 pcam.start()
