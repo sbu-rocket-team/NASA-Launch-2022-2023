@@ -45,6 +45,14 @@ def getAccelGyroMagVal():
 
     return accelMag, gyroMag
 
+
+def getAccelVal():
+    mpu_accel = MPU.get_accel_data()
+    accelVec = np.array([mpu_accel["x"], mpu_accel["y"], mpu_accel["z"]]) 
+    accelMag = np.linalg.norm(accelVec)
+    return accelMag
+
+
 """
 Gets the component velocities in 1 second intervals. Returns any combination of the three axis.
 

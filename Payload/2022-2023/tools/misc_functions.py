@@ -1,3 +1,7 @@
+from tools import pinout
+from tools import setup_gpio as sg
+from tools.setup_gpio import GPIO
+
 """
 Gets the time that passed since start of program in hr:min:sec
 
@@ -21,3 +25,15 @@ def timeElapsed(timeStart, timeRef):
 
 def getTransmittion():
     pass
+
+def beepON():
+    GPIO.output(pinout.BUZZER, 1)
+
+def beepOFF():
+    GPIO.output(pinout.BUZZER, 0)
+
+def blinkON():
+    GPIO.output(pinout.LED, 1)    
+
+def blinkOFF():
+    GPIO.output(pinout.LED, 0)

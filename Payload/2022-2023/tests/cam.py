@@ -2,9 +2,9 @@ import time
 import os
 
 import matplotlib as plt
-import cv2
+#import cv2
 
-import Picamera2 as pc2
+from picamera2 import Picamera2 as pc2
 import libcamera as lc
 
 IMGNAME = 'imgEdit.jpg'
@@ -12,10 +12,10 @@ flipPic = False
 
 imgFile = "test.jpg"
 
-pcam = pc2.Picamera2()
-pcam_config = Picamera2.still_configuration(main={"size": (1920, 1080)})
+pcam = pc2()
+pcam_config = pcam.still_configuration(main={"size": (1920, 1080)}, display=None)
 pcam.configure(pcam_config)
-pcam.set_controls({"AfMode": lc.controls.AfModeEnum.Continuous}) # is autofocus needed ... 
+#pcam.set_controls({"AfMode": lc.controls.AfModeEnum.Continuous}) # is autofocus needed ... not supported on cam
 pcam.start()
 time.sleep(2) #bare min of 2 sec
 pcam.capture_file(imgFile)
