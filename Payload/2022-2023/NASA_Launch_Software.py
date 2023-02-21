@@ -11,23 +11,16 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 
-<<<<<<< HEAD
-import radioSim as rS   # remove from final product
-#import camFunct as camF
-#import mpuFunct as mpuF
-#import motorFunct as mF
-#import encoderFunct as eF
-import instructFunct as instF
-import imgFunct as imgF
-import miscFunct as miscF
-import txtFunct as txtF
-=======
-from tools import radio_simulator as rS, instruction_functions as instF, img_functions as imgF, misc_functions as miscF, mpu_functions as mpuF
->>>>>>> e6f35517bc417bb0a3a08fedad94116cdab85b59
+#import RPi.GPIO as GPIO
 
+from tools import radio_simulator as rS
 
-import RPi.GPIO as GPIO
-#import picamera
+#from tools import mpu_functions as mpuF
+#from tools import cam_functions as camF
+from tools import instruction_functions as instF
+from tools import img_functions as imgF
+from tools import misc_functions as miscF
+from tools import txt_functions as txtF
 
 CALLSIGN = "KQ4CTL"
 
@@ -35,25 +28,26 @@ matchingInstr = True
 hasFlown = False
 deployed = False
 finishedTask = False
-isGreyscale = False
-isCustomFilter = False
+
+filterType = "N"
+isGreyscale = False         # may remove
+isCustomFilter = False      # may remove
 flipPic = False
 
 flipCounter = 0
 fallVel = -5
 relCamRot = 0
 
-# arducam imx477 B0262
-# https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/
-# https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/PiCamera2-User-Guide/
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SAVEDIMAGES_DIR = os.path.join(SCRIPT_DIR, "savedImages")
+#SAVEDIMAGES_DIR = os.chdir ("/home/pi/[INPUT NAME HERE]")
+TESTIMAGES_DIR = os.path.join(SCRIPT_DIR, "TestImages")
 
-RADIOTEXT = "pie.txt"
+RADIOTEXT = os.path.join(SCRIPT_DIR, "pie.txt")
+OUTPUTTEXT = os.path.join(SCRIPT_DIR, "outputText.txt")
 
-#imgFile = None
-IMGNAME = "field.jpg"
-script_dir = os.path.dirname(os.path.abspath(__file__))
-img_dir = os.path.join(script_dir, "TestImages")
-imgFile = os.path.join(img_dir, IMGNAME)
+imgName = ""
+imgCount = 0
 
 accelStart = None
 gryoStart = None
@@ -63,15 +57,19 @@ gryoStart = None
 Document
 """
 def executeInstructions(instructionList):
+    #global camera
     global timeOn
-    global isGreyscale
-    global isCustomFilter
+    global isGreyscale      #same
+    global isCustomFilter   #same
     global flipCounter
     global flipPic
-    global imgFile
     global relCamRot
+    global imgCount
+    global filterType
+    global SAVEDIMAGES_DIR  # actual
+    global OUTPUTTEXT
 
-    img = None
+    global TESTIMAGES_DIR   # virtual
 
     tempList = instructionList[:]
     listLen = len(tempList)
@@ -98,27 +96,39 @@ def executeInstructions(instructionList):
                     #rotateCamera("L", abs(relCamRot))
                     relCamRot = 0
 
-                # imgFile = asihuidlaihdsafh
-                img = cv2.imread(imgFile, cv2.IMREAD_ANYCOLOR)
                 timeTaken = miscF.timeElapsed(timeOn, time.time())
-                imgF.saveIMG(img, timeTaken, isGreyscale, isCustomFilter, flipPic)
+                imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
+                #os.chdir(SAVEDIMAGES_DIR)      #actual
+                #camF.takePic(camera, imgName)  #acutal
+                print(imgName)
+                txtF.writeFile(OUTPUTTEXT, imgName)
+
+                img = cv2.imread(os.path.join(TESTIMAGES_DIR, "field.jpg"))     #virtual
+                #img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))        #actual
+
+                img = imgF.processIMG(img, timeTaken, filterType, flipPic)
+                os.chdir(SAVEDIMAGES_DIR)   #virtual
+                cv2.imwrite(imgName, img)   #virtual
+                
+                imgCount += 1
 
                 plt.figure("Test")
                 plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
                 plt.axis("off")
                 plt.show()
 
-                # showImg()...
                 print("C3 take pic, ", end="")
             case "D4":
                 # Color to Greyscale
-                isGreyscale = True
-                isCustomFilter = False
+                #isGreyscale = True
+                #isCustomFilter = False
+                filterType = "G"
                 print("D4 to greyscale, ", end="")
             case "E5":
                 # Greyscale to Color
-                isGreyscale = False
-                isCustomFilter = False
+                #isGreyscale = False
+                #isCustomFilter = False
+                filterType = "N"
                 print("E5 to color, ", end="")
             case "F6":
                 # Rotate 180* ... flip upside down
@@ -131,17 +141,20 @@ def executeInstructions(instructionList):
                 print("F6 rotate 180*, ", end="")
             case "G7":
                 # Apply chosen filters
-                isCustomFilter = True
-                isGreyscale = False
+                #isCustomFilter = True
+                #isGreyscale = False
+                filterType = "C"
                 print("G7 custom filter, ", end="")
             case "H8":
                 # Remove all filters
-                isGreyscale = False
-                isCustomFilter = False
+                #isGreyscale = False
+                #isCustomFilter = False
+                filterType = "N"
                 flipPic = False # I'm assuming this is condsidered a filter?
                 print("H8 remove filters, ", end="")
         
-        print(str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
+        #print(str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
+        print()
         listLen = len(tempList)
 
 #main tasks
@@ -171,8 +184,14 @@ while (not (hasFlown & deployed)):
             print("Passed Deployment \n")
 
             # open payload
+            
+            # camera = camF.initializeCam()     # actual
+            # take picture to see if opened and if not dont lift? TODO
+            
             # lift camera
             deployed = True
+
+txtF.createFile(OUTPUTTEXT)
 
 while (hasFlown and deployed and (not finishedTask)):
     # get radio signal... read from txt file hopefully
@@ -182,6 +201,7 @@ while (hasFlown and deployed and (not finishedTask)):
     
     #instr1 = rS.genRandInstr(5, 20)
     instr1 = txtF.readFile(RADIOTEXT)
+    txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
 
     print("Random instruction strings")
     print(instr1)
@@ -193,30 +213,7 @@ while (hasFlown and deployed and (not finishedTask)):
     print(eventList1_1)
     print()
 
-    tempCopy1 = eventList1_1[:]
-    tempCopy2 = eventList1_1[:]
-    rS.createError(tempCopy1)
-    rS.createError(tempCopy2)
-    
-    print("Instruction Lists post chance")
-    print(tempCopy1)
-    print(tempCopy2)
-    print()
-
-    # note... does A1 == a1???
-    matchingInstr1, DiffInstr1 = instF.compareInstructions(eventList1_1, tempCopy1)
-    matchingInstr2, DiffInstr2 = instF.compareInstructions(eventList1_1, tempCopy2)
-    
-    print("Matching? and # differences")
-    print(matchingInstr1, DiffInstr1)
-    print(matchingInstr2, DiffInstr2)
-
-    if (DiffInstr1 < DiffInstr2):
-        print("first one less mistake")
-        executeList = tempCopy1
-    else:
-        print("second one less mistake")
-        executeList = tempCopy2
+    executeList = eventList1_1
 
     print("\nExecuting Instructions... what, grey? custom? flipped?")
     executeInstructions(executeList)

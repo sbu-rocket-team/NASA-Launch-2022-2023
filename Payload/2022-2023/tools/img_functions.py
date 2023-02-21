@@ -83,7 +83,7 @@ def fourFilters(img):
 
   imgComb = cv2.vconcat([imgT, imgB])
   imgComb[imgYQ1:imgYQ2, imgXQ1:imgXQ2] = imgC
-  imgComb = cv2.flip(imgComb, 0)
+  imgComb = cv2.rotate(imgComb, cv2.ROTATE_90_CLOCKWISE)
 
   return imgComb
 
@@ -111,7 +111,11 @@ def stampImg(img, timeStamp, filterText):
   textLocation = (int(0.005*imgX), int(0.99*imgY))
 
   (labelX, labelY), baseline = cv2.getTextSize(filterText, TEXTFONT, textScale, textThick)
-  textBoxEnd = (int(labelX + (0.01*imgX)), int(0.95*imgY))
+  (labelX2, labelY2), baseline = cv2.getTextSize(timeStamp, TEXTFONT, textScale, textThick)
+  if (labelX2 > labelX):
+    textBoxEnd = (int(labelX2 + (0.01*imgX)), int(0.95*imgY))
+  else:
+    textBoxEnd = (int(labelX + (0.01*imgX)), int(0.95*imgY))
 
   cv2.rectangle(img, textBoxStart, textBoxEnd, BLACK, -1)
   cv2.putText(img, filterText, textLocation, TEXTFONT, textScale, WHITE, textThick, TEXTLINE)
@@ -121,31 +125,52 @@ def stampImg(img, timeStamp, filterText):
 
 """
 TODO: DOCUMENT
-show image
+
+
+- filter : "N"ormal, "G"reyscale, "C"ustom
+- inverted : 
 """
-def saveIMG(img, timeStamp, greyScale, custFil, flip):
-    filText = ""
+def getImgName(timeStamp, filter, inverted, count):
+    imgName = ""
+    imgName += timeStamp.replace(":", "")
 
-    if (not (greyScale or custFil)):
-        filText += "No Filter "
-    if (custFil and (not (greyScale and flip))):
-        img = fourFilters(img)
-        filText += "No Filter, Saturated/Brighten, Greyscale, Inverted, Flipped"
-    elif (custFil and (not greyScale)):
-        img = fourFilters(img)
-        filText += "Saturated/Brighten, Greyscale, Inverted, Flipped"
-    elif (custFil and (not flip)):
-        img = fourFilters(img)
-        filText += "No Filter, Saturated/Brighten, Greyscale, Inverted"
-    if (greyScale):
-        img = cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
-        filText += "Greyscale "
-    if (flip):
-        img = cv2.flip(img, 0)
-        filText += "Flipped "
+    if (filter == "N"):
+       imgName += "_normal"
+    elif (filter == "G"):
+       imgName += "_greyscale"
+    elif (filter == "C"):
+       imgName += "_custom"
+
+    if (inverted):
+       imgName += "_flipped"
     
-    img = stampImg(img, timeStamp, filText)
+    imgName += "_" + str(count).zfill(3) + ".jpg"
 
-    # add asve image code
+    return imgName
+
+"""
+TODO: DOCUMENT
+
+
+- filter : "N"ormal, "G"reyscale, "C"ustom
+- inverted : 
+"""
+def processIMG(img, timeStamp, filter, flip):
+    filterText = ""
+
+    if (flip):
+       filterText += " flipped"
+       img = cv2.flip(img, 0)
+
+    if (filter == "N"):
+        filterText = "Normal"
+    elif (filter == "G"):
+        filterText = "Greyscale"
+        img = cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+    elif (filter == "C"):
+       filterText = "(Normal, (Saturated/Brightened, Greyscale) + Inversed) * Rotated"
+       img = fourFilters(img)
+
+    img = stampImg(img, timeStamp, filterText)
 
     return img

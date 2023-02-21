@@ -24,8 +24,9 @@ MGR = (25 * 34 * 37 * 35 * 38) / (12 * 9 * 10 * 13 * 10) # actual motor gearbox 
 CGR = 86 / 20 # camera spur/bevel gear ratio, x:xx
 
 MPR = round(CPR * MGR * CGR) # total counter per output rotation
-
 CPD = MPR / 360 # counts per degree
+
+COUNTDELAY = 40 # for 20D motor, need to test for micro
 
 savedDegree = 0 # basically savedCounter ... -240 to 240, postive to the right
 counter = 0 # position/counter
@@ -50,7 +51,6 @@ def virtualEncoder():
 Parameters:
 - direction [char]: "R"ight, "L"eft
 """
-# make so it doesn't try to choke itself
 def rotateCam(direction, degree = 60):
     print("Rotating", direction, degree)
     degree = degree % 360
@@ -77,7 +77,7 @@ def rotateCam(direction, degree = 60):
 
     counter = 0 # reset counter from previous runs
 
-    reqCounter = round(degree * CPD)
+    reqCounter = round(degree * CPD) - COUNTDELAY
 
     if (direction == "R"):
         # turn on motor that turns right
