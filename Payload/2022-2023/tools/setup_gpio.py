@@ -1,5 +1,6 @@
-import pinout
-import RPi.GPIO as GPIO
+from tools import pinout
+from tools import virtGPIO as GPIO
+#import RPi.GPIO as GPIO
 
 # Dont know if i need to initialize any SPI or I2C stuff?
 # xian zai wo yo bing chilling!
