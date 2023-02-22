@@ -7,6 +7,7 @@ KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3  KQ4CTL C3 D4 C3 G7 C3 E5
 000004_custom_002.jpg
 000005_normal_003.jpg
 000006_normal_flipped_004.jpg
-000006_greyscale_flipped_005.jpg
-000007_custom_flipped_006.jpg
-000008_normal_007.jpg
+000007_greyscale_flipped_005.jpg
+000008_custom_flipped_006.jpg
+000009_normal_007.jpg
+Total Runtime is... 00:00:10

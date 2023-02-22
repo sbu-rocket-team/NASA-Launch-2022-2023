@@ -1,5 +1,5 @@
 """
-Group: SBU Rocket Team
+Property Of: SBU Rocket Team
 
 Written By: Jewick Shi
 Edited By: Ethan Carr
@@ -11,16 +11,18 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 
-#import RPi.GPIO as GPIO
-
-from tools import radio_simulator as rS
-
 #from tools import mpu_functions as mpuF
 #from tools import cam_functions as camF
+#from tools import motor_functions as motF
 from tools import instruction_functions as instF
 from tools import img_functions as imgF
-from tools import misc_functions as miscF
+from tools import misc_functions as misF
 from tools import txt_functions as txtF
+#from tools import pinout as po
+
+# delete these later
+from tools import radio_simulator as rS
+import graphImages as gI
 
 CALLSIGN = "KQ4CTL"
 
@@ -30,17 +32,20 @@ deployed = False
 finishedTask = False
 
 filterType = "N"
-isGreyscale = False         # may remove
-isCustomFilter = False      # may remove
 flipPic = False
 
 flipCounter = 0
-fallVel = -5
 relCamRot = 0
+
+FALL_VELOCITY_TH = -5
+MIN_ACCEL_TH = 9
+MAX_ACCEL_TH = 10
+MIN_GYRO_TH = -0.5
+MAX_GYRO_TH = 0.5
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SAVEDIMAGES_DIR = os.path.join(SCRIPT_DIR, "savedImages")
-#SAVEDIMAGES_DIR = os.chdir ("/home/pi/[INPUT NAME HERE]")
+PREIMAGES_DIR = os.path.join(SCRIPT_DIR, "deployImages")
 TESTIMAGES_DIR = os.path.join(SCRIPT_DIR, "TestImages")
 
 RADIOTEXT = os.path.join(SCRIPT_DIR, "pie.txt")
@@ -56,11 +61,8 @@ gryoStart = None
 """
 Document
 """
-def executeInstructions(instructionList):
+def executeInstructions(instructionList, timeOn):
     #global camera
-    global timeOn
-    global isGreyscale      #same
-    global isCustomFilter   #same
     global flipCounter
     global flipPic
     global relCamRot
@@ -79,82 +81,46 @@ def executeInstructions(instructionList):
         instrCase = tempList.pop()
         
         match instrCase:
-            case "A1":
-                # Turn 60* right
+            case "A1": # Turn 60* right
                 relCamRot += 60
-                print("A1 turn 60* right, ", end="")
-            case "B2":
-                # Turn 60* left
+            case "B2": # Turn 60* left
                 relCamRot -= 60
-                print("B2 turn 60* left, ", end="")
-            case "C3":
-                # Take picture, but honestly this might do everything lol
+            case "C3": # Take picture, but honestly this might do everything lol
                 if (relCamRot > 0):
                     #rotateCamera("R", abs(relCamRot))
-                    relCamRot = 0
+                    pass
                 elif (relCamRot < 0):
                     #rotateCamera("L", abs(relCamRot))
-                    relCamRot = 0
+                    pass
+                relCamRot = 0
 
-                timeTaken = miscF.timeElapsed(timeOn, time.time())
+                timeTaken = misF.timeElapsed(timeOn, time.time())
                 imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
-                #os.chdir(SAVEDIMAGES_DIR)      #actual
-                #camF.takePic(camera, imgName)  #acutal
-                print(imgName)
+                camF.takePic(camera, imgName, SAVEDIMAGES_DIR)  #acutal
                 txtF.writeFile(OUTPUTTEXT, imgName)
 
-                img = cv2.imread(os.path.join(TESTIMAGES_DIR, "field.jpg"))     #virtual
-                #img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))        #actual
+                img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))
 
                 img = imgF.processIMG(img, timeTaken, filterType, flipPic)
-                os.chdir(SAVEDIMAGES_DIR)   #virtual
-                cv2.imwrite(imgName, img)   #virtual
                 
                 imgCount += 1
+                time.sleep(1)
 
-                plt.figure("Test")
-                plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-                plt.axis("off")
-                plt.show()
-
-                print("C3 take pic, ", end="")
-            case "D4":
-                # Color to Greyscale
-                #isGreyscale = True
-                #isCustomFilter = False
+            case "D4": # Color to Greyscale
                 filterType = "G"
-                print("D4 to greyscale, ", end="")
-            case "E5":
-                # Greyscale to Color
-                #isGreyscale = False
-                #isCustomFilter = False
+            case "E5": # Greyscale to Color
                 filterType = "N"
-                print("E5 to color, ", end="")
-            case "F6":
-                # Rotate 180* ... flip upside down
+            case "F6": # Rotate 180* ... flip upside down
                 flipCounter += 1
                 if (flipCounter % 2 == 1):
                     flipPic = True
                 elif (flipCounter % 2 == 0):
                     flipPic = False
-
-                print("F6 rotate 180*, ", end="")
-            case "G7":
-                # Apply chosen filters
-                #isCustomFilter = True
-                #isGreyscale = False
+            case "G7": # Apply chosen filters
                 filterType = "C"
-                print("G7 custom filter, ", end="")
-            case "H8":
-                # Remove all filters
-                #isGreyscale = False
-                #isCustomFilter = False
+            case "H8": # Remove all filters
                 filterType = "N"
                 flipPic = False # I'm assuming this is condsidered a filter?
-                print("H8 remove filters, ", end="")
-        
-        #print(str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
-        print()
         listLen = len(tempList)
 
 #main tasks
@@ -169,59 +135,74 @@ while (not (hasFlown & deployed)):
     """
     if (not hasFlown):
         #zVel1 = getVel(zComp= True)
-        if (zVel1 <= fallVel):
+        if (zVel1 <= FALL_VELOCITY_TH):
             print("waiting to see if stil falling")
             #zVel2 = getVel(zComp= True)
             time.sleep(2)
-            if (zVel2 <= fallVel):
+            if (zVel2 <= FALL_VELOCITY_TH):
                 print("weeeeeeeeeeeeeeeeeeeeee")
                 hasFlown = True
     else:
-        # need get stablize ranges
         #accelMag, gryoMag = getAccelGyroMagVal()
-        # might need a resting variable to beeter change
-        if (accelMag >= 8 and accelMag <= 10) and (gryoMag >= -1 and gryoMag <= 1):
+        if (MIN_ACCEL_TH <= accelMag <= MAX_ACCEL_TH) and (MIN_GYRO_TH <= gryoMag <= MAX_GYRO_TH):
             print("Passed Deployment \n")
 
-            # open payload
-            
-            # camera = camF.initializeCam()     # actual
-            # take picture to see if opened and if not dont lift? TODO
-            
-            # lift camera
+            """
+            camera = camF.initializeCam()
+            os.chdir(PREIMAGES_DIR)
+            camF.takePic(camera, "preLead.jpg")
+
+            motF.smoothStart(po.LEADSCREW_PWN, po.LEADSCREW_ENABLE, "F") #idk which
+            time.sleep(5)   #need to test to determine appprox
+            motF.motorOff(po.LEADSCREW_ENABLE)
+
+            os.chdir(PREIMAGES_DIR) # dont think i need to recall
+            camF.takePic(camera, "postLead.jpg")
+
+            deployImg1_Loc = os.path.join(PREIMAGES_DIR, "preLead.jpg")
+            deployImg2_Loc = os.path.join(PREIMAGES_DIR, "postLead.jpg")
+
+            opened = camF.compareImgs(deployImg1_Loc, deployImg2_Loc, thrsh)
+
+            if (opened):
+                motF.smoothStart(po.yes, po.yestoo, "F") # idk what the lift pins are and direction
+                time.sleep(5)   #need to test to determine approx
+                motF.motorOff(po.yestoo)
+            """
             deployed = True
 
 txtF.createFile(OUTPUTTEXT)
 
 while (hasFlown and deployed and (not finishedTask)):
     # get radio signal... read from txt file hopefully
-    # parse signal
-    # execute signal 
-    # call it a day
     
     #instr1 = rS.genRandInstr(5, 20)
     instr1 = txtF.readFile(RADIOTEXT)
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
     txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
 
-    print("Random instruction strings")
-    print(instr1)
-    print()
+    print("Random instruction strings\n", instr1, "\n")
 
     eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
 
-    print("Instruction Lists")
-    print(eventList1_1)
-    print()
+    print("Instruction Lists\n", eventList1_1, "\n")
 
     executeList = eventList1_1
 
-    print("\nExecuting Instructions... what, grey? custom? flipped?")
-    executeInstructions(executeList)
+    print("\nExecuting Instructions...")
+    executeInstructions(executeList, timeOn)
     print("\nPassed Operation")
+    
     finishedTask = True
+
+    timeOff = misF.timeElapsed(timeOn, time.time())
+    timeOff = "Total Runtime is... " + timeOff
+    txtF.writeFile(OUTPUTTEXT, timeOff)
 
     # what if record for 8 mins... get 3 readings
     # compare the 3 readings
 
     # either run the readings with the least differences to otheres
     # or run a combined reading, where the same instruction, picked and if completely different, pick 1 randomly
+
+    gI.showImages(SAVEDIMAGES_DIR)

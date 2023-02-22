@@ -1,6 +1,13 @@
-from tools import pinout
-from tools import setup_gpio as sg
-from tools.setup_gpio import GPIO
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+Edited By: Ethan Carr
+"""
+
+#from tools import pinout
+#from tools import setup_gpio as sg
+#from tools.setup_gpio import GPIO
 
 """
 Gets the time that passed since start of program in hr:min:sec
@@ -26,7 +33,7 @@ def timeElapsed(timeStart, timeRef):
 def getTransmittion():
     pass
 
-def beepON():
+"""def beepON():
     GPIO.output(pinout.BUZZER, 1)
 
 def beepOFF():
@@ -36,4 +43,4 @@ def blinkON():
     GPIO.output(pinout.LED, 1)    
 
 def blinkOFF():
-    GPIO.output(pinout.LED, 0)
+    GPIO.output(pinout.LED, 0)"""

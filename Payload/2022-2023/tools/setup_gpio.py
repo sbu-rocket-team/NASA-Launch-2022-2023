@@ -1,3 +1,8 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Ethan Carr
+"""
 import pinout
 import RPi.GPIO as GPIO
 

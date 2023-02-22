@@ -1,3 +1,9 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+Edited By: Ethan Carr
+"""
 import time
 
 import mpu6050 as imu

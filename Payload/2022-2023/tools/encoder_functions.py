@@ -1,19 +1,19 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+Edited By: Ethan Carr
+"""
 import time
 
 import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-import motorControl as mc
+import motor_functions as motF
+import pinout as po
 
 import random
 
-
-encoderA = 5 # pin of hall effect
-
-"""GPIO.setmode(GPIO.BOARD)
-GPIO.setup(encoderA, GPIO.IN)
-GPIO.setup(7, GPIO.OUT) # motor control GPIO pin
-"""
 
 """https://www.pololu.com/product/4761"""
 
@@ -34,24 +34,18 @@ reqCounter = 0 # wanted counter to reach desire degree
 
 def readEncoder(pin):
     global counter
-    if pin == 5:
-        if GPIO.input(5) == GPIO.HIGH:
+    if pin == po.ENCODER:
+        if GPIO.input(pin) == GPIO.HIGH:
             counter += 1
         else:
             counter -= 1
     return counter
 
-def virtualEncoder():
-    global counter
-
-    if (random.randint(0,10) > 1):
-        counter += 1
-
 """
 Parameters:
 - direction [char]: "R"ight, "L"eft
 """
-def rotateCam(direction, degree = 60):
+def rotateCam(direction, encoderPin, degree = 60):
     print("Rotating", direction, degree)
     degree = degree % 360
     print("Actual rotation:", degree)
@@ -80,7 +74,6 @@ def rotateCam(direction, degree = 60):
     reqCounter = round(degree * CPD) - COUNTDELAY
 
     if (direction == "R"):
-        # turn on motor that turns right
         newDegree = savedDegree + degree
         print("New Angle:", newDegree)
 
@@ -90,12 +83,11 @@ def rotateCam(direction, degree = 60):
             reqCounter = 0
 
             rotateCam("L", reDegree)
-        else:
-            # turn motor on here
+        else:    # turn motor on here
+            motF.smoothStart(po.ROT_PWM, po.ROT_ENABLE, "R") # lmao idk if left or right or up or down or cw or ccw
             savedDegree += degree
             print("motor on, turning right")
     elif (direction == "L"):
-        # turn on motor that turns left
         newDegree = savedDegree - degree
         print("New Angle:", newDegree)
 
@@ -105,67 +97,14 @@ def rotateCam(direction, degree = 60):
             reqCounter = 0
 
             rotateCam("R", reDegree)
-        else:
-            # turn motor on here
+        else: # turn motor on here
+            motF.smoothStart(po.ROT_PWM, po.ROT_ENABLE, "L") # lmao idk if left or right or up or down or cw or ccw
             savedDegree -= degree
             print("motor on, turning left")
     
     while (counter < reqCounter):
-        #GPIO.add_event_detect(encoderA, GPIO.RISING, callback=readEncoder)
-        virtualEncoder()
+        GPIO.add_event_detect(encoderPin, GPIO.RISING, callback=readEncoder)
     
-    # turn off motor
+    motF.motorOFF(po.ROT_ENABLE) # turn off motor
     print("Counters:", counter)
     print("motor off")
-
-"""
-# end result, R 60
-rotateCam("R", 240)
-print("Current Angle:", savedDegree)
-print()
-
-rotateCam("R", 60)
-print("Current Angle:", savedDegree)
-print()
-
-rotateCam("R", 60)
-print("Current Angle:", savedDegree)
-print()
-
-rotateCam("L", 300)
-print("Current Angle:", savedDegree)
-print()
-"""
-
-"""
-# end result, R 60
-rotateCam("L", 120)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("R", 300)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("L", 120)
-print("Current Angle:", savedDegree, "\n")
-"""
-
-"""
-# end result, left 60
-rotateCam("L", 120)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("R", 360)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("R", 120)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("R", 180)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("L", 240)
-print("Current Angle:", savedDegree, "\n")
-"""
-
-"""
-rotateCam("L", 120)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("R", 300)
-print("Current Angle:", savedDegree, "\n")
-rotateCam("L", 180)
-print("Current Angle:", savedDegree, "\n")
-"""

@@ -2,29 +2,13 @@ import time
 
 import RPi.GPIO as GPIO
 
+from tools import setup_gpio
+
 FREQ = 120
 
-#enable pins
-enablePinD = None 
-enablePinMLift = None
-enablePinMRot = None
-
-#identify the right motor pins
-motorPinD = None
-motorPinMLift = None
-motorPinMRot = None
-
-# as tuples just to reudce .setup lines
-pinDList = [enablePinD, motorPinD]
-pinMLList = [enablePinMLift, motorPinMLift]
-pinMRList = [enablePinMRot, motorPinMRot]
-
-pinList = [pinDList, pinMLList, pinMRList]
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(pinList, GPIO.OUT)
-
 # https://www.pololu.com/product/2135
+
+setup_gpio.setup()
 
 """
 Mode HIGH...
@@ -63,12 +47,18 @@ def motorON(pPin, ePin, direction, intSpd, endSpd = -1):
         GPIO.output(pPin, 1)
         pwm = GPIO.PWM(ePin, FREQ)
         pwm.start(eSpeed)
-    rampSpd(pwm, intSpd, endSpd)
+    changeSpd(pwm, intSpd, endSpd)
 
-def mtorOff(ePin):
+"""
+DOCUMENT TODO
+"""
+def motorOFF(ePin):
     GPIO.output(ePin, 0)
 
-def rampSpd(pwm, startSpd, endSpd):
+"""
+DOCUMENT TODO
+"""
+def changeSpd(pwm, startSpd, endSpd):
     if (endSpd > 100):
         endSpd = 100
 
@@ -88,5 +78,8 @@ def rampSpd(pwm, startSpd, endSpd):
         pwm.ChangeDutyCycle(i)
         time.sleep(0.5)
 
-def cleanPins(pinList):
-    GPIO.cleanup(pinList)
+"""
+DOCUMENT TODO
+"""
+def smoothStart(pPin, ePin, direction):
+    motorON(pPin, ePin, direction, 50, 100)

@@ -1,5 +1,14 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+"""
+import os
+import math
+
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -174,3 +183,22 @@ def processIMG(img, timeStamp, filter, flip):
     img = stampImg(img, timeStamp, filterText)
 
     return img
+
+"""
+DOCUMENT TODO
+"""
+def compareImgs(imgFile1, imgFile2, threshold):
+    img1 = cv2.imread(imgFile1)
+    img2 = cv2.imread(imgFile2)
+
+    imgDif = cv2.subtract(img1, img2)
+    imgDif = cv2.cvtColor(imgDif, cv2.COLOR_BGR2GRAY)
+
+    #saideb
+    #imgNorm = cv2.normalize(imgDif, cv2.NORMINF)   # choice 1 # this method might be wrong
+    imgNorm = np.mean(imgDif)   # choice 2 # i think this would be better
+
+    if (imgNorm < threshold):
+        return True
+    elif (imgNorm > threshold):
+        return False

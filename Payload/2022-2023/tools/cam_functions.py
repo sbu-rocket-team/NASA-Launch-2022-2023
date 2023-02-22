@@ -1,3 +1,9 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+Edited By: Ethan Carr
+"""
 import time
 import os
 
@@ -15,6 +21,9 @@ def initializeCam():
     time.sleep(2)
     return pcam
 
-def takePic(camera, imgName):
+def takePic(camera, imgName, directory = os.path.dirname(os.path.abspath(__file__))):
+    camera.start()
+    time.sleep(2)
+    os.chdir(directory)
     camera.capture_file(imgName)
     camera.close()

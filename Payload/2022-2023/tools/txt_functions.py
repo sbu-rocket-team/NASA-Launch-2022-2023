@@ -1,3 +1,8 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+"""
 import os
 
 def readFile(fileName):
