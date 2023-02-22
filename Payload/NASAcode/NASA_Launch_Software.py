@@ -12,8 +12,12 @@ import cv2
 import matplotlib.pyplot as plt
 
 #from tools import mpu_functions as mpuF
+<<<<<<< HEAD:Payload/2022-2023/NASA_Launch_Software.py
 #from tools import cam_functions as camF
 #from tools import motor_functions as motF
+=======
+from tools import cam_functions as camF
+>>>>>>> refs/remotes/origin/main:Payload/NASAcode/NASA_Launch_Software.py
 from tools import instruction_functions as instF
 from tools import img_functions as imgF
 from tools import misc_functions as misF
@@ -48,7 +52,7 @@ SAVEDIMAGES_DIR = os.path.join(SCRIPT_DIR, "savedImages")
 PREIMAGES_DIR = os.path.join(SCRIPT_DIR, "deployImages")
 TESTIMAGES_DIR = os.path.join(SCRIPT_DIR, "TestImages")
 
-RADIOTEXT = os.path.join(SCRIPT_DIR, "pie.txt")
+RADIOTEXT = os.path.join(SCRIPT_DIR, "radioMessage.txt")
 OUTPUTTEXT = os.path.join(SCRIPT_DIR, "outputText.txt")
 
 imgName = ""
@@ -80,6 +84,7 @@ def executeInstructions(instructionList, timeOn):
     while listLen > 0:
         instrCase = tempList.pop()
         
+<<<<<<< HEAD:Payload/2022-2023/NASA_Launch_Software.py
         match instrCase:
             case "A1": # Turn 60* right
                 relCamRot += 60
@@ -121,6 +126,85 @@ def executeInstructions(instructionList, timeOn):
             case "H8": # Remove all filters
                 filterType = "N"
                 flipPic = False # I'm assuming this is condsidered a filter?
+=======
+
+        if(instrCase == "A1"):
+            # Turn 60* right
+            relCamRot += 60
+            print("A1 turn 60* right, ", end="")
+        elif(instrCase == "B2"):
+            # Turn 60* left
+            relCamRot -= 60
+            print("B2 turn 60* left, ", end="")
+        elif(instrCase == "C3"):
+            # Take picture, but honestly this might do everything lol
+            if (relCamRot > 0):
+                #rotateCamera("R", abs(relCamRot))
+                relCamRot = 0
+            elif (relCamRot < 0):
+                #rotateCamera("L", abs(relCamRot))
+                relCamRot = 0
+
+            timeTaken = miscF.timeElapsed(timeOn, time.time())
+            imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
+            os.chdir(SAVEDIMAGES_DIR)      #actual
+            camF.takePic(camera, imgName)  #acutal
+            print(imgName)
+            txtF.writeFile(OUTPUTTEXT, imgName)
+
+            #img = cv2.imread(os.path.join(TESTIMAGES_DIR, "field.jpg"))     #virtual
+            img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))        #actual
+
+            img = imgF.processIMG(img, timeTaken, filterType, flipPic)
+            #os.chdir(SAVEDIMAGES_DIR)   #virtual
+            #cv2.imwrite(imgName, img)   #virtual
+            
+            imgCount += 1
+
+            plt.figure("Test")
+            plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+            plt.axis("off")
+            plt.show()
+
+            print("C3 take pic, ", end="")
+        elif(instrCase == "D4"):
+            # Color to Greyscale
+            #isGreyscale = True
+            #isCustomFilter = False
+            filterType = "G"
+            print("D4 to greyscale, ", end="")
+        elif(instrCase == "E5"):
+            # Greyscale to Color
+            #isGreyscale = False
+            #isCustomFilter = False
+            filterType = "N"
+            print("E5 to color, ", end="")
+        elif(instrCase == "F6"):
+            # Rotate 180* ... flip upside down
+            flipCounter += 1
+            if (flipCounter % 2 == 1):
+                flipPic = True
+            elif (flipCounter % 2 == 0):
+                flipPic = False
+
+            print("F6 rotate 180*, ", end="")
+        elif(instrCase == "G7"):
+            # Apply chosen filters
+            #isCustomFilter = True
+            #isGreyscale = False
+            filterType = "C"
+            print("G7 custom filter, ", end="")
+        elif(instrCase == "H8"):
+            # Remove all filters
+            #isGreyscale = False
+            #isCustomFilter = False
+            filterType = "N"
+            flipPic = False # I'm assuming this is condsidered a filter?
+            print("H8 remove filters, ", end="")
+        
+        #print(str(isGreyscale) + " " + str(isCustomFilter) + " " + str(flipPic))
+        print()
+>>>>>>> refs/remotes/origin/main:Payload/NASAcode/NASA_Launch_Software.py
         listLen = len(tempList)
 
 #main tasks

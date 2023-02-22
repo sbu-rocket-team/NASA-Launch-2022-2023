@@ -1,3 +1,4 @@
+<<<<<<< HEAD:Payload/2022-2023/tools/setup_gpio.py
 """
 Property Of: SBU Rocket Team
 
@@ -5,6 +6,11 @@ Written By: Ethan Carr
 """
 import pinout
 import RPi.GPIO as GPIO
+=======
+from tools import pinout
+from tools import virtGPIO as GPIO
+#import RPi.GPIO as GPIO
+>>>>>>> refs/remotes/origin/main:Payload/NASAcode/tools/setup_gpio.py
 
 # Dont know if i need to initialize any SPI or I2C stuff?
 # xian zai wo yo bing chilling!
