@@ -1,4 +1,10 @@
 """
+Property Of: SBU Rocket Team
+
+Written By: Jewick Shi
+"""
+
+"""
 need to add in 
 gets 2 instructions out of the radio signal...
 6 mins record to guarntee at least 2 readings... best case 3 full proper, avg case 2 full 1 partial

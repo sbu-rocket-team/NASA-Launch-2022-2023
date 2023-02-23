@@ -26,7 +26,7 @@ def timeElapsed(timeStart, timeRef):
 def getTransmittion():
     pass
 
-def beepON():
+"""def beepON():
     GPIO.output(pinout.BUZZER, 1)
 
 def beepOFF():
@@ -36,4 +36,4 @@ def blinkON():
     GPIO.output(pinout.LED, 1)    
 
 def blinkOFF():
-    GPIO.output(pinout.LED, 0)
+    GPIO.output(pinout.LED, 0)"""

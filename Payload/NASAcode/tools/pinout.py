@@ -1,3 +1,9 @@
+"""
+Property Of: SBU Rocket Team
+
+Written By: Ethan Carr
+"""
+
 # Map of all of the payload GPIO pins back to the rasp-pi. 
 # Makes it a little easier to call the pins.
 
