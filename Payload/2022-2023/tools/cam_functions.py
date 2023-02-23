@@ -13,9 +13,9 @@ from picamera2 import Picamera2 as pc2
 # https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/
 # https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/PiCamera2-User-Guide/
 
-def initializeCam():
+def initializeCam(resolution = (1920, 1080)):
     pcam = pc2()
-    pcam_config = pcam.create_still_configuration(main={"size": (1920, 1080)})
+    pcam_config = pcam.create_still_configuration(main={"size": resolution})
     pcam.configure(pcam_config)
     pcam.start()
     time.sleep(2)

@@ -15,11 +15,9 @@ def initializeCam(res = (1920,1080)):
     pcam.configure(pcam_config)
     return pcam
 
-def takePic(camera, imgName,destination=""):
+def takePic(camera, imgName, directory = os.path.dirname(os.path.abspath(__file__))):
     camera.start()
     time.sleep(2)
+    os.chdir(directory)
     camera.capture_file(imgName)
-    if(destination!=""):
-        mv.move("./"+imgName,"./NASAcode/"+str(destination))
-        time.sleep(0.01) # Need to move the files.
     camera.close() # Needs to close as stills configuration only allows one frame buffer allocated

@@ -20,17 +20,14 @@ def createFile(fileName):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
 
-    file = open(fileLoc, "w")
-    file.write("SBU Rocket Team records... \n")
-    file.close()
+    with open(fileLoc, "w") as file: 
+        file.write("SBU Rocket Team records... \n")
 
 def writeFile(fileName, fileText):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
 
-    file = open(fileLoc, "a")
-
     text = "\n" + fileText
-    file.write(text)
-    
-    file.close()
+
+    with open(fileLoc, "a") as file: 
+        file.write(text)
