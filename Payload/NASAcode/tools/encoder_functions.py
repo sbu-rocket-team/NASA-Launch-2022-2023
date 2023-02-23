@@ -3,7 +3,7 @@ import time
 import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-import motorControl as mc
+from NASAcode.tools import motorControl as mc
 
 import random
 

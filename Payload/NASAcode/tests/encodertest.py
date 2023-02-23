@@ -4,15 +4,15 @@ from time import sleep
 sg.setup()
 
 def motorON(time):
-    mc.run_test(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
     sleep(time)
-    mc.off(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.off(p.ROT_ENABLE, p.ROT_PWM)
 
 #motorON(1)
 
 def encoderTest(time):
     samplerate = 500
-    mc.run_test(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
     ct = 0
     prev = 0
     for i in range(samplerate):
@@ -24,12 +24,12 @@ def encoderTest(time):
         prev = val
         
     print(ct)
-    mc.off(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.off(p.ROT_ENABLE, p.ROT_PWM)
 
 #encoderTest(1)
 
 def encoderTest2(cts):
-    mc.run_test(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
     ct = 0
     prev = 0
     while(ct < cts):
@@ -38,7 +38,7 @@ def encoderTest2(cts):
             ct += 1
         
         prev = val
-    mc.off(p.ROT_ENABLE, p.ROT_PHASE)
+    mc.off(p.ROT_ENABLE, p.ROT_PWM)
 
 encoderTest2(2500)
 

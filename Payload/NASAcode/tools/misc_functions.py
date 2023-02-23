@@ -1,6 +1,6 @@
-from tools import pinout
-from tools import setup_gpio as sg
-from tools.setup_gpio import GPIO
+from NASAcode.tools import pinout
+from NASAcode.tools import setup_gpio as sg
+from NASAcode.tools.setup_gpio import GPIO
 
 """
 Gets the time that passed since start of program in hr:min:sec

@@ -9,19 +9,27 @@
 # pip install mpu6050-raspberrypi numpy
 
 
-from mpu6050 import mpu6050
+
 from time import sleep #sleep([seconds]) used to pause ... arduino delay()
-from tools import mpu_functions as mpuF, misc_functions as miscF, setup_gpio as sg
-import numpy as np
+from mpu6050 import mpu6050
+from NASAcode.tools import mpu_functions as mpuF, misc_functions as miscF, setup_gpio as sg
 
 
 MPU = mpu6050(0x68)
 sg.setup()
 
+time_delay = 1
+samplerate = 30 # hz
+maxi = samplerate * time_delay
 i = 0
-while(i < 100):
+while(i < maxi):
     reading = mpuF.getAccelVal()
-    if abs(reading) > 10:
+    print(reading)
+    if abs(reading) > 15:
         miscF.beepON()
     else:
         miscF.beepOFF()
+    sleep(1/samplerate)
+    i += 1
+
+sg.cleanup()
