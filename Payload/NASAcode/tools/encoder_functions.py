@@ -12,9 +12,6 @@ import matplotlib.pyplot as plt
 from NASAcode.tools import motor_functions as motF
 import pinout as po
 
-import random
-
-
 """https://www.pololu.com/product/4761"""
 
 MAXROT = 240 # either directions
@@ -45,7 +42,7 @@ def readEncoder(pin):
 Parameters:
 - direction [char]: "R"ight, "L"eft
 """
-def rotateCam(direction, encoderPin, degree = 60):
+def rotateCam(direction, degree = 60, encoderPin = po.ENCODER):
     print("Rotating", direction, degree)
     degree = degree % 360
     print("Actual rotation:", degree)
@@ -62,7 +59,6 @@ def rotateCam(direction, encoderPin, degree = 60):
         elif (direction == "L"):
             direction = "R"
         degree = 360 - degree
-        print("fasta the other way,", direction, degree)
     elif ((degree == 180) and (abs(savedDegree) == 180)):
         if (savedDegree < 0):
             direction = "R"
@@ -84,7 +80,7 @@ def rotateCam(direction, encoderPin, degree = 60):
 
             rotateCam("L", reDegree)
         else:    # turn motor on here
-            motF.smoothStart(po.ROT_PWM, po.ROT_ENABLE, "R") # lmao idk if left or right or up or down or cw or ccw
+            motF.smoothStart(po.ROT_DIR, po.ROT_PWM, "R") # lmao idk if left or right or up or down or cw or ccw
             savedDegree += degree
             print("motor on, turning right")
     elif (direction == "L"):
@@ -98,7 +94,7 @@ def rotateCam(direction, encoderPin, degree = 60):
 
             rotateCam("R", reDegree)
         else: # turn motor on here
-            motF.smoothStart(po.ROT_PWM, po.ROT_ENABLE, "L") # lmao idk if left or right or up or down or cw or ccw
+            motF.smoothStart(po.ROT_DIR, po.ROT_PWM, "L") # lmao idk if left or right or up or down or cw or ccw
             savedDegree -= degree
             print("motor on, turning left")
     

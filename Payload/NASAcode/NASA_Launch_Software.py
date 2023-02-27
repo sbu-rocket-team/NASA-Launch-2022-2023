@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from tools import mpu_functions as mpuF
 from tools import cam_functions as camF
 from tools import motor_functions as motF
+from tools import encoder_functions as encF
 from tools import instruction_functions as instF
 from tools import img_functions as imgF
 from tools import misc_functions as misF
@@ -22,47 +23,58 @@ from tools import pinout as po
 
 # delete these later
 from tools import radio_simulator as rS
-import graphImages as gI
 
 CALLSIGN = "KQ4CTL"
 
+# General Booleans
 matchingInstr = True
 hasFlown = False
 deployed = False
 finishedTask = False
 
+# Image Filters
+imgCount = 0
 filterType = "N"
 flipPic = False
-
 flipCounter = 0
+
+# Camera rotations
 relCamRot = 0
 
+# Threshold values
+IMG_BRIGHTNESS_TH = 10
 FALL_VELOCITY_TH = -5
 MIN_ACCEL_TH = 9
 MAX_ACCEL_TH = 10
 MIN_GYRO_TH = -0.5
 MAX_GYRO_TH = 0.5
 
+# File Directories
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SAVEDIMAGES_DIR = os.path.join(SCRIPT_DIR, "savedImages")
 PREIMAGES_DIR = os.path.join(SCRIPT_DIR, "deployImages")
 TESTIMAGES_DIR = os.path.join(SCRIPT_DIR, "TestImages")
 
+# Timers
+LEADSCREWOPEN_TIMER = 30      # need to test to determine appprox
+CAMERALIFT_TIMER = 5            # need to test to determine appprox
+
+# Direct Files
 RADIOTEXT = os.path.join(SCRIPT_DIR, "radioMessage.txt")
 OUTPUTTEXT = os.path.join(SCRIPT_DIR, "outputText.txt")
+ACCELOUTPUT = os.path.join(SCRIPT_DIR, "AccelData.txt")
+GYROOUTPUT = os.path.join(SCRIPT_DIR, "GyroData.txt")
 
-imgName = ""
-imgCount = 0
-
+# i forgor what these are for
 accelStart = None
 gryoStart = None
 
 # executes base on command ... need to make commands for each case
 """
-Document
+Document/FINISH TODO
 """
 def executeInstructions(instructionList, timeOn):
-    #global camera
+    global camera
     global flipCounter
     global flipPic
     global relCamRot
@@ -71,15 +83,12 @@ def executeInstructions(instructionList, timeOn):
     global SAVEDIMAGES_DIR  # actual
     global OUTPUTTEXT
 
-    global TESTIMAGES_DIR   # virtual
-
     tempList = instructionList[:]
     listLen = len(tempList)
     timeTaken = None
 
     while listLen > 0:
         instrCase = tempList.pop()
-        
 
         if (instrCase == "A1"): # Turn 60* right
             relCamRot += 60
@@ -89,13 +98,9 @@ def executeInstructions(instructionList, timeOn):
 
         elif(instrCase == "C3"): # Take picture, but honestly this might do everything lol
             if (relCamRot > 0):
-                #rotateCamera("R", abs(relCamRot))
-                pass
+                encF.rotateCam("R", abs(relCamRot)) # idk direction
             elif (relCamRot < 0):
-                #rotateCamera("L", abs(relCamRot))
-                pass
-            
-            relCamRot = 0
+                encF.rotateCamera("L", abs(relCamRot))  # idk direction
 
             timeTaken = misF.timeElapsed(timeOn, time.time())
             imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
@@ -106,6 +111,7 @@ def executeInstructions(instructionList, timeOn):
             img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))
             img = imgF.processIMG(img, timeTaken, filterType, flipPic)
             
+            relCamRot = 0
             imgCount += 1
 
         elif(instrCase == "D4"): # Color to Greyscale
@@ -113,7 +119,6 @@ def executeInstructions(instructionList, timeOn):
 
         elif(instrCase == "E5"): # Greyscale to Color
             filterType = "N"
-            print("E5 to color, ", end="")
 
         elif(instrCase == "F6"): # Rotate 180* ... flip upside down
             flipCounter += 1
@@ -132,49 +137,50 @@ def executeInstructions(instructionList, timeOn):
         listLen = len(tempList)
 
 #main tasks
-accelMag, gryoMag = 9.8, 0 # m/s2, *
-zVel1, zVel2= -15, -15 # m/s
-
 timeOn = time.time()
+txtF.createFile(ACCELOUTPUT)
+txtF.createFile(GYROOUTPUT)
 
 while (not (hasFlown & deployed)):
     """
     TODO: condition logic
     """
     if (not hasFlown):
-        #zVel1 = getVel(zComp= True)
+        zVel1 = mpuF.getVel(zComp= True)
+        # get velocity, acceleration, gyro... mag or comp ... with time
         if (zVel1 <= FALL_VELOCITY_TH):
-            print("waiting to see if stil falling")
-            #zVel2 = getVel(zComp= True)
+            zVel2 = mpuF.getVel(zComp= True)
             time.sleep(2)
             if (zVel2 <= FALL_VELOCITY_TH):
-                print("weeeeeeeeeeeeeeeeeeeeee")
                 hasFlown = True
+        time.sleep(2)
     else:
-        #accelMag, gryoMag = getAccelGyroMagVal()
+        accelMag, gryoMag = mpuF.getAccelGyroMagVal()
         if (MIN_ACCEL_TH <= accelMag <= MAX_ACCEL_TH) and (MIN_GYRO_TH <= gryoMag <= MAX_GYRO_TH):
-            print("Passed Deployment \n")
 
-            
             camera = camF.initializeCam()
             camF.takePic(camera, "preLead.jpg", PREIMAGES_DIR)
 
-            motF.smoothStart(po.LEADSCREW_PWN, po.LEADSCREW_ENABLE, "F") #idk which
-            time.sleep(5)   #need to test to determine appprox
-            motF.motorOff(po.LEADSCREW_ENABLE)
+            motF.smoothStart(po.LEADSCREW_DIR, po.LEADSCREW_PWM, "F") #idk which
+            time.sleep(LEADSCREWOPEN_TIMER)
+            motF.motorOff(po.LEADSCREW_PWM)
 
             camF.takePic(camera, "postLead.jpg", PREIMAGES_DIR)
 
             deployImg1_Loc = os.path.join(PREIMAGES_DIR, "preLead.jpg")
             deployImg2_Loc = os.path.join(PREIMAGES_DIR, "postLead.jpg")
 
-            opened = camF.compareImgs(deployImg1_Loc, deployImg2_Loc, imgTH)
+            opened = camF.compareImgs(deployImg1_Loc, deployImg2_Loc, IMG_BRIGHTNESS_TH)
 
             if (opened):
-                motF.smoothStart(po.yes, po.yestoo, "F") # idk what the lift pins are and direction
-                time.sleep(5)   #need to test to determine approx
-                motF.motorOff(po.yestoo)
+                motF.smoothStart(po.RP_DIR, po.RP_PWM, "F")  # idk what the lift pins are and direction
+                time.sleep(CAMERALIFT_TIMER)
+                motF.motorOff(po.RP_DIR)
+                deployText = "Opening/Deployed at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
+            else:
+                deployText = "Unopen/Deployed at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
 
+            txtF.writeFile(OUTPUTTEXT, deployText)
             deployed = True
 
 txtF.createFile(OUTPUTTEXT)
@@ -184,6 +190,8 @@ while (hasFlown and deployed and (not finishedTask)):
     
     instr1 = txtF.readFile(RADIOTEXT)
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
+    receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
+    txtF.writeFile(OUTPUTTEXT, receivedText)
     txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
 
     eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
