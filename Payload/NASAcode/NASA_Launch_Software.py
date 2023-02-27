@@ -136,15 +136,13 @@ def executeInstructions(instructionList, timeOn):
 
         listLen = len(tempList)
 
-#main tasks
+"""#main tasks
 timeOn = time.time()
 txtF.createFile(ACCELOUTPUT)
 txtF.createFile(GYROOUTPUT)
 
 while (not (hasFlown & deployed)):
-    """
-    TODO: condition logic
-    """
+    # TODO conditions
     if (not hasFlown):
         zVel1 = mpuF.getVel(zComp= True)
         # get velocity, acceleration, gyro... mag or comp ... with time
@@ -186,6 +184,29 @@ while (not (hasFlown & deployed)):
 txtF.createFile(OUTPUTTEXT)
 
 while (hasFlown and deployed and (not finishedTask)):
+    # get radio signal... read from txt file hopefully
+    
+    instr1 = txtF.readFile(RADIOTEXT)
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
+    receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
+    txtF.writeFile(OUTPUTTEXT, receivedText)
+    txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
+
+    eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
+
+    executeList = eventList1_1
+
+    executeInstructions(executeList, timeOn)
+    
+    finishedTask = True
+
+    timeOff = misF.timeElapsed(timeOn, time.time())
+    timeOff = "Total Runtime is... " + timeOff
+    txtF.writeFile(OUTPUTTEXT, timeOff)"""
+
+timeOn = time.time()
+txtF.createFile(OUTPUTTEXT)
+while (not finishedTask):
     # get radio signal... read from txt file hopefully
     
     instr1 = txtF.readFile(RADIOTEXT)
