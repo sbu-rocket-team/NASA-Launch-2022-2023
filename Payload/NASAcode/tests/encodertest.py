@@ -67,5 +67,17 @@ def encoderTest4():
     currentDegree = encF.rotateCam("R", currentDegree, 90)
     print(currentDegree)
 
+def encoderTest5():
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
 
 sg.cleanup()
