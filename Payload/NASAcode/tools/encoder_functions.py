@@ -95,3 +95,4 @@ def rotateCam(direction, currentAngle, degree = 60, encoderPin = po.ENCODER, enc
     motF.motorOFF(po.ROT_ENABLE) # turn off motor
     print("Counters:", counter)
     print("motor off")
+    return currentAngle
