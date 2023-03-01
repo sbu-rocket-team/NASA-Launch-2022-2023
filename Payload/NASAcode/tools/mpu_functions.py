@@ -12,7 +12,6 @@ import numpy as np
 
 MPU = imu.mpu6050(0x68)
 
-#mpu stuff
 """""
 MPU 6050
 https://www.youtube.com/watch?v=JTFa5l7zAA4
@@ -39,7 +38,7 @@ Returns:
 - accelMag [float?]: Magnitude of the acceleration vector
 - gyroMag [float?]: Magnitude of the angular vector
 """
-def getAccelGyroMagVal():
+def getAccelGyroMagVal(Acceleration=True, Gyro=True):
     mpu_accel = MPU.get_accel_data()
     mpu_gyro = MPU.get_gyro_data()
 
@@ -49,15 +48,54 @@ def getAccelGyroMagVal():
     accelMag = np.linalg.norm(accelVec)
     gyroMag = np.linalg.norm(gyroVec)
 
-    return accelMag, gyroMag
+    if (Acceleration and Gyro):
+        return accelMag, gyroMag
+    elif (Acceleration):
+        return accelMag
+    elif (Gyro):
+        return gyroMag
+    else:
+        return None;
 
-
+# what this for???
 def getAccelVal():
     mpu_accel = MPU.get_accel_data()
     accelVec = np.array([mpu_accel["x"], mpu_accel["y"], mpu_accel["z"]]) 
     accelMag = np.linalg.norm(accelVec)
     return accelMag
 
+"""
+Gets the component accelerations. Returns any combination of the three axis.
+
+Parameters:
+- xComp [Bool]: True if looking for x-component, default False
+- yComp [Bool]: True if looking for y-component, default False
+- zComp [Bool]: True if looking for z-component, default False
+
+Returns:
+- xVel [float?]: Average acceleration in the x-direction
+- yVel [float?]: Average acceleration in the y-direction
+- zVel [float?]: Average acceleration in the z-direction
+"""
+def getAccel(xComp=True, yComp=True, zComp=True):
+    accel = MPU.get_accel_data()
+
+    if (xComp and yComp and zComp):
+        return accel["x"], accel["y"], accel["z"]
+    elif (xComp and yComp):
+        return accel["x"], accel["y"]
+    elif (xComp and zComp):
+        return accel["x"], accel["z"]
+    elif (yComp and zComp):
+        return accel["y"], accel["z"]
+    elif (xComp):
+        return accel["x"]
+    elif (yComp):
+        return accel["y"]
+    elif (zComp):
+        return accel["z"]
+    else:
+        return None
 
 """
 Gets the component velocities in 1 second intervals. Returns any combination of the three axis.
@@ -66,123 +104,80 @@ Parameters:
 - xComp [Bool]: True if looking for x-component, default False
 - yComp [Bool]: True if looking for y-component, default False
 - zComp [Bool]: True if looking for z-component, default False
+- dt [float]: time difference between velocities
 
 Returns:
 - xVel [float?]: Average velocity in the x-direction
 - yVel [float?]: Average velocity in the y-direction
 - zVel [float?]: Average velocity in the z-direction
 """
-def getVel(xComp = False, yComp = False, zComp = False):
-    if (xComp and yComp and zComp):
-        timeRef1 = time.perf_counter()
-        xVal1 = MPU.get_accel_data()["x"]
-        yVal1 = MPU.get_accel_data()["y"]
-        zVal1 = MPU.get_accel_data()["z"]
-        time.sleep(1)
-        xVal2 = MPU.get_accel_data()["x"]
-        yVal2 = MPU.get_accel_data()["y"]
-        zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.perf_counter()
+def getVel(xComp=True, yComp=True, zComp=True, dt=1.0):
+    timeRef1 = time.perf_counter()
+    accel = MPU.get_accel_data()
+    xVal1 = accel["x"]
+    yVal1 = accel["y"]
+    zVal1 = accel["z"]
+    time.sleep(dt)
+    timeRef2 = time.perf_counter()
+    accel = MPU.get_accel_data()
+    xVal2 = accel["x"]
+    yVal2 = accel["y"]
+    zVal2 = accel["z"]
         
-        timeRefDif = timeRef2 - timeRef1
-        xValDif = xVal2 - xVal1
-        yValDif = yVal2 - yVal1
-        zValDif = zVal2 - zVal1
+    timeRefDif = timeRef2 - timeRef1
+    xValDif = xVal2 - xVal1
+    yValDif = yVal2 - yVal1
+    zValDif = zVal2 - zVal1
 
-        xVel = xValDif/timeRefDif
-        yVel = yValDif/timeRefDif
-        zVel = zValDif/timeRefDif
+    xVel = xValDif/timeRefDif
+    yVel = yValDif/timeRefDif
+    zVel = zValDif/timeRefDif
 
+    if (xComp and yComp and zComp):
         return xVel, yVel, zVel
     elif (xComp and yComp):
-        timeRef1 = time.perf_counter()
-        xVal1 = MPU.get_accel_data()["x"]
-        yVal1 = MPU.get_accel_data()["y"]
-        time.sleep(1)
-        xVal2 = MPU.get_accel_data()["x"]
-        yVal2 = MPU.get_accel_data()["y"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        xValDif = xVal2 - xVal1
-        yValDif = yVal2 - yVal1
-        
-        xVel = xValDif/timeRefDif
-        yVel = yValDif/timeRefDif
-
         return xVel, yVel
     elif (xComp and zComp):
-        timeRef1 = time.perf_counter()
-        xVal1 = MPU.get_accel_data()["x"]
-        zVal1 = MPU.get_accel_data()["z"]
-        time.sleep(1)
-        xVal2 = MPU.get_accel_data()["x"]
-        zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        xValDif = xVal2 - xVal1
-        zValDif = zVal2 - zVal1
-
-        xVel = xValDif/timeRefDif
-        zVel = zValDif/timeRefDif
-
         return xVel, zVel
     elif (yComp and zComp):
-        timeRef1 = time.perf_counter()
-        yVal1 = MPU.get_accel_data()["y"]
-        zVal1 = MPU.get_accel_data()["z"]
-        time.sleep(1)
-        yVal2 = MPU.get_accel_data()["y"]
-        zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        yValDif = yVal2 - yVal1
-        zValDif = zVal2 - zVal1
-
-        yVel = yValDif/timeRefDif
-        zVel = zValDif/timeRefDif
-
         return yVel, zVel
     elif (xComp):
-        timeRef1 = time.perf_counter()
-        xVal1 = MPU.get_accel_data()["x"]
-        time.sleep(1)
-        xVal2 = MPU.get_accel_data()["x"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        xValDif = xVal2 - xVal1
-
-        xVel = xValDif/timeRefDif
-
         return xVel
     elif (yComp):
-        timeRef1 = time.perf_counter()
-        yVal1 = MPU.get_accel_data()["y"]
-        time.sleep(1)
-        yVal2 = MPU.get_accel_data()["y"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        yValDif = yVal2 - yVal1
-
-        yVel = yValDif/timeRefDif
-
         return yVel
     elif (zComp):
-        timeRef1 = time.perf_counter()
-        zVal1 = MPU.get_accel_data()["z"]
-        time.sleep(1)
-        zVal2 = MPU.get_accel_data()["z"]
-        timeRef2 = time.perf_counter()
-        
-        timeRefDif = timeRef2 - timeRef1
-        zValDif = zVal2 - zVal1
-
-        zVel = zValDif/timeRefDif
-
         return zVel
+    else:
+        return None
+
+"""
+Gets the component angular change. Returns any combination of the three axis.
+
+Parameters:
+- xComp [Bool]: True if looking for x-component, default False
+- yComp [Bool]: True if looking for y-component, default False
+- zComp [Bool]: True if looking for z-component, default False
+
+Returns:
+- xVel [float?]: Angular change in the x-direction
+- yVel [float?]: Angular change in the y-direction
+- zVel [float?]: Angular change in the z-direction
+"""
+def getGyro(xComp=True, yComp=True, zComp=True):
+    gyro = MPU.get_gyro_data()
+    if (xComp and yComp and zComp):
+        return gyro["x"], gyro["y"], gyro["z"]
+    elif (xComp and yComp):
+        return gyro["x"], gyro["y"]
+    elif (xComp and zComp):
+        return gyro["x"], gyro["z"]
+    elif (yComp and zComp):
+        return gyro["y"], gyro["z"]
+    elif (xComp):
+        return gyro["x"]
+    elif (yComp):
+        return gyro["y"]
+    elif (zComp):
+        return gyro["z"]
     else:
         return None

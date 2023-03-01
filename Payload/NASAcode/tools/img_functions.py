@@ -8,7 +8,6 @@ import math
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -186,19 +185,28 @@ def processIMG(img, timeStamp, filter, flip):
 
 """
 DOCUMENT TODO
+
+for threshold ...
+0 if same picture
++ if brighter
+- if darker
 """
-def compareImgs(imgFile1, imgFile2, threshold):
-    img1 = cv2.imread(imgFile1)
-    img2 = cv2.imread(imgFile2)
+def compareImgs(imgFile1, imgFile2, threshold=0):
+   img1 = cv2.cvtColor(cv2.imread(imgFile1), cv2.COLOR_BGR2HLS)
+   img2 = cv2.cvtColor(cv2.imread(imgFile2), cv2.COLOR_BGR2HLS)
 
-    imgDif = cv2.subtract(img1, img2)
-    imgDif = cv2.cvtColor(imgDif, cv2.COLOR_BGR2GRAY)
+   _, l1, _ = cv2.split(img1)
+   _, l2, _ = cv2.split(img2)
 
-    #saideb
-    #imgNorm = cv2.normalize(imgDif, cv2.NORMINF)   # choice 1 # this method might be wrong
-    imgNorm = np.mean(imgDif)   # choice 2 # i think this would be better
+   l1Norm = np.mean(l1)
+   l2Norm = np.mean(l2)
 
-    if (imgNorm < threshold):
-        return True
-    elif (imgNorm > threshold):
-        return False
+   print(l1Norm) # remove later
+   print(l2Norm)
+
+   imgDif = l2Norm - l1Norm
+
+   if (imgDif >= threshold):
+      return True
+   elif (imgDif <= threshold):
+      return False
