@@ -58,7 +58,7 @@ Five section img filtering with a flip across the x-axis...
 Parameter:
 - img [Array*]: image to be processed
 """
-def fourFilters(img):
+def fourFilters(img, satMul=1, satAdd=255, lightMul=2, lightAdd=0):
   imgSize = img.shape
   imgY, imgX = imgSize[0], imgSize[1]
 
@@ -69,21 +69,20 @@ def fourFilters(img):
   imgYQ2 = (imgY // 4) * 3
   imgXQ2 = (imgX // 4) * 3
 
-
   imgTL = img[:imgYHalf, :imgXHalf]
   imgBL = img[(imgYHalf+1):, :imgXHalf]
   imgTR = img[:imgYHalf, (imgXHalf+1):]
   imgBR = img[(imgYHalf+1):, (imgXHalf+1):]
   imgC = img[imgYQ1:imgYQ2, imgXQ1:imgXQ2]
 
-  imgTL = filterLightSat(imgTL, satMul= 1, satAdd= 255, lightMul=2)
-  imgBL = cv2.bitwise_not((filterLightSat(imgBL, satMul= 1, satAdd= 255, lightMul=2)))
+  imgTL = filterLightSat(imgTL, satMul, satAdd, lightMul, lightAdd)
+  imgBL = cv2.bitwise_not((filterLightSat(imgBL, satMul, satAdd, lightMul, lightAdd)))
 
   imgTR = cv2.cvtColor(cv2.cvtColor(imgTR, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
   imgBR = cv2.cvtColor(cv2.cvtColor(imgBR, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
 
-  imgTR = filterLightSat(imgTR, satMul= 1, satAdd= 255, lightMul=2)
-  imgBR = cv2.bitwise_not((filterLightSat(imgBR, satMul= 1, satAdd= 255, lightMul=2)))
+  imgTR = filterLightSat(imgTR, satMul, satAdd, lightMul, lightAdd)
+  imgBR = cv2.bitwise_not((filterLightSat(imgBR, satMul, satAdd, lightMul, lightAdd)))
 
 
   imgT = cv2.hconcat([imgTL, imgTR])
