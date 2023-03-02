@@ -70,7 +70,7 @@ def rotateCam(direction, currentAngle, degree = 60, encoderPin = po.ENCODER, enc
 
             rotateCam("L", reDegree)
         else:    # turn motor on here
-            motF.smoothStart(encoderMotorPhase, encoderMotorEnable, "R") #
+            motF.motorON(encoderMotorPhase, encoderMotorEnable, "R", 100) #
             currentAngle += degree
             print("motor on, turning right")
     elif (direction == "L"):
@@ -84,7 +84,7 @@ def rotateCam(direction, currentAngle, degree = 60, encoderPin = po.ENCODER, enc
 
             rotateCam("R", reDegree)
         else: # turn motor on here
-            motF.smoothStart(encoderMotorPhase, encoderMotorEnable, "L") #
+            motF.motorON(encoderMotorPhase, encoderMotorEnable, "L", 100) #
             currentAngle -= degree
             print("motor on, turning left")
     

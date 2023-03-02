@@ -123,6 +123,19 @@ def binaryOpeningSearch(img, start, middle, end, pThresh = 0.5):
     pLS = np.linalg.norm(cv2.mean(imgLS))
     pRS = np.linalg.norm(cv2.mean(imgRS))
 
+    print("norms, left, right")
+    print(pLS, pRS)
+
+    plt.figure(1)
+    plt.imshow(imgLS)
+    plt.axis("off")
+
+    plt.figure(2)
+    plt.imshow(imgRS)
+    plt.axis("off")
+
+    plt.show()
+
     if ((front == back) or (pRS == pLS) or (abs(front - back) == 2)):
         if (pRS < pLS):
             return end

@@ -42,7 +42,7 @@ def encoderTest2(cts):
         prev = val
     mc.off(p.ROT_DIR, p.ROT_PWM)
 
-encoderTest2(100)
+#encoderTest2(100)
 
 ct = 0
 
@@ -53,21 +53,31 @@ def readEncoder(pin):
             ct += 1
 
 def encoderTest3(cts):
+    turnOff = True
+
     mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
     global ct
     prev = 0
-    while(ct < cts):
-        sg.GPIO.add_event_detect(p.ENCODER, sg.GPIO.RISING, callback=readEncoder)
-    mc.off(p.ROT_ENABLE, p.ROT_PWM)
+
+    sg.GPIO.add_event_detect(p.ENCODER, sg.GPIO.RISING, callback=readEncoder)
+    
+    while (turnOff):
+        if (ct > cts):
+            mc.off(p.ROT_ENABLE, p.ROT_PWM)
+            turnOff = False
+            
+encoderTest3()
 
 currentDegree = 0
 
 def encoderTest4():
+    global currentDegree
     print(currentDegree)
     currentDegree = encF.rotateCam("R", currentDegree, 90)
     print(currentDegree)
 
 def encoderTest5():
+    global currentDegree
     print(currentDegree)
     currentDegree = encF.rotateCam("R", currentDegree)
     print(currentDegree)
