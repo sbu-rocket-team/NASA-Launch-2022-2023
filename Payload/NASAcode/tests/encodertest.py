@@ -1,10 +1,10 @@
-from ..tools import pinout as p, setup_gpio as sg, motor_functions as mc
+from NASAcode.tools import pinout as p, setup_gpio as sg, motor_functions as mc
 from time import sleep
 
 sg.setup()
 
 def motorON(time):
-    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
+    mc.run_test(p.ROT_DIR, p.ROT_PWM)
     sleep(time)
     mc.off(p.ROT_ENABLE, p.ROT_PWM)
 
@@ -12,7 +12,7 @@ def motorON(time):
 
 def encoderTest(time):
     samplerate = 500
-    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
+    mc.run_test(p.ROT_DIR, p.ROT_PWM)
     ct = 0
     prev = 0
     for i in range(samplerate):
@@ -24,12 +24,12 @@ def encoderTest(time):
         prev = val
         
     print(ct)
-    mc.off(p.ROT_ENABLE, p.ROT_PWM)
+    mc.off(p.ROT_DIR, p.ROT_PWM)
 
 #encoderTest(1)
 
 def encoderTest2(cts):
-    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
+    mc.run_test(p.ROT_DIR, p.ROT_PWM)
     ct = 0
     prev = 0
     while(ct < cts):
@@ -38,8 +38,8 @@ def encoderTest2(cts):
             ct += 1
         
         prev = val
-    mc.off(p.ROT_ENABLE, p.ROT_PWM)
+    mc.off(p.ROT_DIR, p.ROT_PWM)
 
-encoderTest2(2500)
+encoderTest2(100)
 
 sg.cleanup()

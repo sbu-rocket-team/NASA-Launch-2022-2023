@@ -37,6 +37,13 @@ sudo pip3 install mpu6050-raspberrypi
 cd
 sudo mkdir NASAcode
 
+# Installing camera support
+echo "-- Installing Arducam Camera Support --"
+sudo wget -O install_pivariety_pkgs.sh https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/install_pivariety_pkgs.sh
+sudo chmod +x install_pivariety_pkgs.sh
+sudo ./install_pivariety_pkgs.sh -p libcamera_dev
+sudo ./install_pivariety_pkgs.sh -p libcamera_apps
+
 # Prompt a reboot
 sudo echo -e "\nSetup script complete! Make sure to do a reboot soon\n"
 
@@ -58,12 +65,7 @@ sudo echo -e "\nSetup script complete! Make sure to do a reboot soon\n"
 
 # old depricated 
 
-# Installing camera support
-#echo "-- Installing Arducam Camera Support --"
-#sudo wget -O install_pivariety_pkgs.sh https://github.com/ArduCAM/Arducam-Pivariety-V4L2-Driver/releases/download/install_script/install_pivariety_pkgs.sh
-#sudo chmod +x install_pivariety_pkgs.sh
-#sudo ./install_pivariety_pkgs.sh -p libcamera_dev
-#sudo ./install_pivariety_pkgs.sh -p libcamera_apps
+
 
 # We are gonna be sticking with the stock version of Python for ease of use and compile time, using 3.9.X
 

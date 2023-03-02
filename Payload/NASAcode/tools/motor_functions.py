@@ -2,7 +2,7 @@ import time
 
 import RPi.GPIO as GPIO
 
-from tools import setup_gpio
+from NASAcode.tools import setup_gpio
 
 FREQ = 120
 MIN_SPD = 40

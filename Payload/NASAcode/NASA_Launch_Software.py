@@ -11,18 +11,18 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 
-from tools import mpu_functions as mpuF
-from tools import cam_functions as camF
-from tools import motor_functions as motF
-from tools import encoder_functions as encF
-from tools import instruction_functions as instF
-from tools import img_functions as imgF
-from tools import misc_functions as misF
-from tools import txt_functions as txtF
-from tools import pinout as po
+from NASAcode.tools import mpu_functions as mpuF
+from NASAcode.tools import cam_functions as camF
+from NASAcode.tools import motor_functions as motF
+from NASAcode.tools import encoder_functions as encF
+from NASAcode.tools import instruction_functions as instF
+from NASAcode.tools import img_functions as imgF
+from NASAcode.tools import misc_functions as misF
+from NASAcode.tools import txt_functions as txtF
+from NASAcode.tools import pinout as po
 
 # delete these later
-from tools import radio_simulator as rS
+from NASAcode.tools import radio_simulator as rS
 
 CALLSIGN = "KQ4CTL"
 
@@ -86,6 +86,7 @@ def executeInstructions(instructionList, timeOn):
     tempList = instructionList[:]
     listLen = len(tempList)
     timeTaken = None
+    
 
     while listLen > 0:
         instrCase = tempList.pop()
@@ -100,16 +101,21 @@ def executeInstructions(instructionList, timeOn):
             if (relCamRot > 0):
                 encF.rotateCam("R", abs(relCamRot)) # idk direction
             elif (relCamRot < 0):
-                encF.rotateCamera("L", abs(relCamRot))  # idk direction
+                encF.rotateCam("L", abs(relCamRot))  # idk direction
 
             timeTaken = misF.timeElapsed(timeOn, time.time())
             imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
-                        
-            camF.takePic(camera, imgName, SAVEDIMAGES_DIR)
+
+            camF.initializeCam()
+            #camF.takePic(camera, imgName, SAVEDIMAGES_DIR)
+            camF.takePic(imgName, SAVEDIMAGES_DIR)
+            print("Captured!")
+            camF.clear()
             txtF.writeFile(OUTPUTTEXT, imgName)
 
             img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))
             img = imgF.processIMG(img, timeTaken, filterType, flipPic)
+            cv2.imwrite(os.path.join(SAVEDIMAGES_DIR, imgName), img)
             
             relCamRot = 0
             imgCount += 1
@@ -206,6 +212,7 @@ while (hasFlown and deployed and (not finishedTask)):
 
 timeOn = time.time()
 txtF.createFile(OUTPUTTEXT)
+
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
     

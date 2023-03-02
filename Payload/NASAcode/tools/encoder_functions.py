@@ -9,8 +9,7 @@ import time
 import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-from NASAcode.tools import motor_functions as motF
-import pinout as po
+from NASAcode.tools import motor_functions as motF, pinout as po
 
 """https://www.pololu.com/product/4761"""
 

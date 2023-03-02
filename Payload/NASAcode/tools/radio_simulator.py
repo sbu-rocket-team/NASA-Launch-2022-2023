@@ -42,23 +42,23 @@ def genRandInstr(teams = 1, length = 1, limit = 8):
             tempRand = random.randint(1,limit)
             Instr += " "
             
-            match tempRand:
-                case 1:
-                    Instr += "A1"
-                case 2:
-                    Instr += "B2"
-                case 3:
-                    Instr += "C3"
-                case 4:
-                    Instr += "D4"
-                case 5:
-                    Instr += "E5"
-                case 6:
-                    Instr += "F6"
-                case 7:
-                    Instr += "G7"
-                case 8:
-                    Instr += "H8"
+            
+            if(tempRand==1):
+                Instr += "A1"
+            elif(tempRand==2):
+                Instr += "B2"
+            elif(tempRand==3):
+                Instr += "C3"
+            elif(tempRand==4):
+                Instr += "D4"
+            elif(tempRand==5):
+                Instr += "E5"
+            elif(tempRand==6):
+                Instr += "F6"
+            elif(tempRand==7):
+                Instr += "G7"
+            elif(tempRand==8):
+                Instr += "H8"
     
     Instr = Instr + " " + Instr
     
@@ -75,23 +75,23 @@ def createError(inList, chance = 10):
     for i in range(len(inList)):
         if (random.randint(1,100) <= chance):
             tempRand = random.randint(1,8)
-            match tempRand:
-                case 1:
-                    inList[i] = "A1"
-                case 2:
-                    inList[i] = "B2"
-                case 3:
-                    inList[i] = "C3"
-                case 4:
-                    inList[i] = "D4"
-                case 5:
-                    inList[i] = "E5"
-                case 6:
-                    inList[i] = "F6"
-                case 7:
-                    inList[i] = "G7"
-                case 8:
-                    inList[i] = "H8"
+
+            if(tempRand==1):
+                inList[i] = "A1"
+            elif(tempRand==2):
+                inList[i] = "B2"
+            elif(tempRand==3):
+                inList[i] = "C3"
+            elif(tempRand==4):
+                inList[i] = "D4"
+            elif(tempRand==5):
+                inList[i] = "E5"
+            elif(tempRand==6):
+                inList[i] = "F6"
+            elif(tempRand==7):
+                inList[i] = "G7"
+            elif(tempRand==8):
+                inList[i] = "H8"
             
             if (random.randint(1,100) <= 50):
                 inList[i] = inList[i].lower()
