@@ -150,12 +150,10 @@ txtF.createFile(GYROOUTPUT)
 while (not (hasFlown & deployed)):
     # TODO conditions
     if (not hasFlown):
-        zVel1 = mpuF.getVel(zComp= True)
         # get velocity, acceleration, gyro... mag or comp ... with time
-        if (zVel1 <= FALL_VELOCITY_TH):
-            zVel2 = mpuF.getVel(zComp= True)
+        if (0 > mpuF.getVel(zComp= True) >= FALL_VELOCITY_TH):
             time.sleep(2)
-            if (zVel2 <= FALL_VELOCITY_TH):
+            if (0 > mpuF.getVel(zComp= True) >= FALL_VELOCITY_TH):
                 hasFlown = True
         time.sleep(2)
     else:
@@ -200,15 +198,18 @@ while (hasFlown and deployed and (not finishedTask)):
 
     eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
 
-    executeList = eventList1_1
+    matching, differences = instF.compareInstructions(eventList1_1, eventList1_2)
 
-    executeInstructions(executeList, timeOn)
+    if (matching and (differences <= 2)):
+        executeList = eventList1_1
+
+        executeInstructions(executeList, timeOn)
     
-    finishedTask = True
+        finishedTask = True
 
-    timeOff = misF.timeElapsed(timeOn, time.time())
-    timeOff = "Total Runtime is... " + timeOff
-    txtF.writeFile(OUTPUTTEXT, timeOff)"""
+        timeOff = misF.timeElapsed(timeOn, time.time())
+        timeOff = "Total Runtime is... " + timeOff
+        txtF.writeFile(OUTPUTTEXT, timeOff)"""
 
 timeOn = time.time()
 txtF.createFile(OUTPUTTEXT)

@@ -25,9 +25,9 @@ xIN2 = Enable pin = PWN (0-100) ... Speed
 """
 
 Parameters:
-- pPin [int] - : Phase pin (actually enable) to turn the motor on/off
-- ePin [int]: Enable pin (actually phase) to control the speed of the motor
-- direction [char]: "F" or "B" for forward/right or backwards/left relatively
+- pPin [int]: Phase pin determines the direction of the motor, 0/1 = forward/backward
+- ePin [int]: Enable pin to control the speed of the motor through PWM, 0-100%
+- direction [char]: "R" or "L" for right or left relatively
 - intSped [int]: Starting speed of the motor, if no endSpd is specified is also the settled speed
 - endSped [int]: Settling speed of the motor, 
 """
@@ -42,17 +42,22 @@ def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1):
         endSpd = intSpd
 
     if (intSpd >= MIN_SPD):
-        if (direction == "F"):
+        if (direction == "R"):
             GPIO.output(pPin, 0)
             pwm = GPIO.PWM(ePin, FREQ)
             pwm.start(intSpd)
-        elif (direction == "B"):
+        elif (direction == "L"):
             GPIO.output(pPin, 1)
             pwm = GPIO.PWM(ePin, FREQ)
             pwm.start(intSpd)
         changeSpd(pwm, intSpd, endSpd)
 
     return pwm
+"""
+DOCUMENT TODO
+"""
+def smoothStart(pPin, ePin, direction):
+    motorON(pPin, ePin, direction, 50, 100)
 
 # delete? added your changes above
 """ 
@@ -101,11 +106,6 @@ def changeSpd(pwm, startSpd, endSpd):
         pwm.ChangeDutyCycle(i)
         time.sleep(0.5)
 
-"""
-DOCUMENT TODO
-"""
-def smoothStart(pPin, ePin, direction):
-    motorON(pPin, ePin, direction, 50, 100)
 
 #################
 def run_test(enable, phase):

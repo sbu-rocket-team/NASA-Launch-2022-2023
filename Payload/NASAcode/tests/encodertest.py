@@ -1,6 +1,8 @@
 from NASAcode.tools import pinout as p, setup_gpio as sg, motor_functions as mc
 from time import sleep
 
+from NASAcode.tools import encoder_functions as encF
+
 sg.setup()
 
 def motorON(time):
@@ -41,5 +43,41 @@ def encoderTest2(cts):
     mc.off(p.ROT_DIR, p.ROT_PWM)
 
 encoderTest2(100)
+
+ct = 0
+
+def readEncoder(pin):
+    global ct
+    if pin == p.ENCODER:
+        if sg.GPIO.input(pin) == sg.GPIO.HIGH:
+            ct += 1
+
+def encoderTest3(cts):
+    mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
+    global ct
+    prev = 0
+    while(ct < cts):
+        sg.GPIO.add_event_detect(p.ENCODER, sg.GPIO.RISING, callback=readEncoder)
+    mc.off(p.ROT_ENABLE, p.ROT_PWM)
+
+currentDegree = 0
+
+def encoderTest4():
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree, 90)
+    print(currentDegree)
+
+def encoderTest5():
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree)
+    print(currentDegree)
 
 sg.cleanup()
