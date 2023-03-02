@@ -21,9 +21,6 @@ from NASAcode.tools import misc_functions as misF
 from NASAcode.tools import txt_functions as txtF
 from NASAcode.tools import pinout as po
 
-# delete these later
-from NASAcode.tools import radio_simulator as rS
-
 CALLSIGN = "KQ4CTL"
 
 # General Booleans
@@ -74,7 +71,6 @@ gryoStart = None
 Document/FINISH TODO
 """
 def executeInstructions(instructionList, timeOn):
-    global camera
     global flipCounter
     global flipPic
     global relCamRot
@@ -106,15 +102,12 @@ def executeInstructions(instructionList, timeOn):
             timeTaken = misF.timeElapsed(timeOn, time.time())
             imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
 
-            camF.initializeCam()
-            #camF.takePic(camera, imgName, SAVEDIMAGES_DIR)
-            camF.takePic(imgName, SAVEDIMAGES_DIR)
-            print("Captured!")
-            camF.clear()
+            camF.takePic(imgName, directory = SAVEDIMAGES_DIR)
             txtF.writeFile(OUTPUTTEXT, imgName)
 
             img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))
             img = imgF.processIMG(img, timeTaken, filterType, flipPic)
+
             cv2.imwrite(os.path.join(SAVEDIMAGES_DIR, imgName), img)
             
             relCamRot = 0
@@ -160,6 +153,7 @@ while (not (hasFlown & deployed)):
         accelMag, gryoMag = mpuF.getAccelGyroMagVal()
         if (MIN_ACCEL_TH <= accelMag <= MAX_ACCEL_TH) and (MIN_GYRO_TH <= gryoMag <= MAX_GYRO_TH):
 
+            #this section might be changed completely
             camera = camF.initializeCam()
             camF.takePic(camera, "preLead.jpg", PREIMAGES_DIR)
 
@@ -208,7 +202,7 @@ while (hasFlown and deployed and (not finishedTask)):
         finishedTask = True
 
         timeOff = misF.timeElapsed(timeOn, time.time())
-        timeOff = "Total Runtime is... " + timeOff
+        timeOff = "\nTotal Runtime is... " + timeOff
         txtF.writeFile(OUTPUTTEXT, timeOff)"""
 
 timeOn = time.time()
@@ -232,7 +226,7 @@ while (not finishedTask):
     finishedTask = True
 
     timeOff = misF.timeElapsed(timeOn, time.time())
-    timeOff = "Total Runtime is... " + timeOff
+    timeOff = "\nTotal Runtime is... " + timeOff
     txtF.writeFile(OUTPUTTEXT, timeOff)
 
     # what if record for 8 mins... get 3 readings
