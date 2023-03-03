@@ -87,6 +87,8 @@ def motorOff(ePin):
 DOCUMENT TODO
 """
 def changeSpd(pwm, startSpd, endSpd):
+    interval = 1
+    
     if (endSpd > 100):
         endSpd = 100
     

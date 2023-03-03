@@ -19,7 +19,7 @@ def encoderTest(time):
     prev = 0
     for i in range(samplerate):
         sleep(time/samplerate)
-        val = sg.GPIO.input(p.ENCODER)
+        val = sg.GPIO.input(p.ROT_DIR)
         if(val == 1 & val != prev):
             ct += 1
         
@@ -35,33 +35,51 @@ def encoderTest2(cts):
     ct = 0
     prev = 0
     while(ct < cts):
-        val = sg.GPIO.input(p.ENCODER)
+        val = sg.GPIO.input(p.ROT_DIR)
         if(val == 1 & val != prev):
             ct += 1
         
         prev = val
     mc.off(p.ROT_DIR, p.ROT_PWM)
 
-#encoderTest2(100)
+#encoderTest2(1281)
+
+def encoderTest2_2(cts):
+    mc.motorON(p.ROT_DIR, p.ROT_PWM, "L", 50)
+    ct = 0
+    prev = 0
+    while(ct < cts):
+        val = sg.GPIO.input(p.ROT_DIR)
+        if(val == 1 & val != prev):
+            ct += 1
+        
+        prev = val
+    mc.motorOff(p.ROT_PWM)
+
+encoderTest2_2(1281)
 
 ct = 0
+rct = 0
 
 def readEncoder(pin):
     global ct
-    if pin == p.ENCODER:
-        if sg.GPIO.input(pin) == sg.GPIO.HIGH:
-            ct += 1
+    global rct
+
+    while (ct < rct):
+        if pin == p.ROT_DIR:
+            if sg.GPIO.input(pin) == sg.GPIO.HIGH:
+                ct += 1
+
+sg.GPIO.add_event_detect(p.ROT_DIR, sg.GPIO.RISING, callback=readEncoder)
 
 def encoderTest3(cts):
     turnOff = True
 
     mc.run_test(p.ROT_ENABLE, p.ROT_PWM)
     global ct
-    prev = 0
-
-    sg.GPIO.add_event_detect(p.ENCODER, sg.GPIO.RISING, callback=readEncoder)
     
     while (turnOff):
+        sleep(0.01)
         if (ct > cts):
             mc.off(p.ROT_ENABLE, p.ROT_PWM)
             turnOff = False

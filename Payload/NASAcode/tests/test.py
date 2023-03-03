@@ -20,7 +20,7 @@ imgO = cv2.imread(os.path.join(TESTIMAGES_DIR, "fieldO.jpg"))
 
 imgC_hls = cv2.cvtColor(imgC, cv2.COLOR_BGR2HLS)
 imgPC_hls = cv2.cvtColor(imgPC, cv2.COLOR_BGR2HLS)
-imgPO_hls = cv2.cvtColor(imgPO, cv2.COLOR_BGR2HLS)
+imgPO_hls = cv2.cvtColor(imgPO, cv2.COLOR_BGR2HLS) # 590
 imgO_hls = cv2.cvtColor(imgO, cv2.COLOR_BGR2HLS) # 1065
 
 _, lC, _ = cv2.split(imgC_hls)
@@ -119,21 +119,53 @@ def binaryOpeningSearch(img, start, middle, end, pThresh = 0.5):
 
     imgLS = img[:, front:half]
     imgRS = img[:, half:back]
+
+    imgLSLE = imgLS[:, :1]
+    imgLSRE = imgLS[:, -1:]
+    imgRSLE = imgRS[:, :1]
+    imgRSRE = imgRS[:, -1:]
     
     pLS = np.linalg.norm(cv2.mean(imgLS))
     pRS = np.linalg.norm(cv2.mean(imgRS))
 
-    print("norms, left, right")
+    pLSLE = np.linalg.norm(cv2.mean(imgLSLE))
+    pLSRE = np.linalg.norm(cv2.mean(imgLSRE))
+    pRSLE = np.linalg.norm(cv2.mean(imgRSLE))
+    pRSRE = np.linalg.norm(cv2.mean(imgRSRE))
+
+    print("\nnorms \nLS, RS")
     print(pLS, pRS)
+    print("\nLSLE, LSRE")
+    print(pLSLE, pLSRE)
+    print("\nRSLE, RSRE")
+    print(pRSLE, pRSRE)
 
     plt.figure(1)
-    plt.imshow(imgLS)
+    plt.subplot(1, 6, 1)
+    plt.imshow(cv2.cvtColor(imgLS, cv2.COLOR_GRAY2RGB))
     plt.axis("off")
 
-    plt.figure(2)
-    plt.imshow(imgRS)
+    plt.subplot(1, 6, 2)
+    plt.imshow(cv2.cvtColor(imgRS, cv2.COLOR_GRAY2RGB))
     plt.axis("off")
 
+    plt.subplot(1, 6, 3)
+    plt.imshow(cv2.cvtColor(imgLSLE, cv2.COLOR_GRAY2RGB))
+    plt.axis("off")
+
+    plt.subplot(1, 6, 4)
+    plt.imshow(cv2.cvtColor(imgLSRE, cv2.COLOR_GRAY2RGB))
+    plt.axis("off")
+
+    plt.subplot(1, 6, 5)
+    plt.imshow(cv2.cvtColor(imgRSLE, cv2.COLOR_GRAY2RGB))
+    plt.axis("off")
+
+    plt.subplot(1, 6, 6)
+    plt.imshow(cv2.cvtColor(imgRSRE, cv2.COLOR_GRAY2RGB))
+    plt.axis("off")
+
+    plt.subplots_adjust(0, 0, 1, 1, 0.1, 0)
     plt.show()
 
     if ((front == back) or (pRS == pLS) or (abs(front - back) == 2)):
@@ -144,11 +176,42 @@ def binaryOpeningSearch(img, start, middle, end, pThresh = 0.5):
     
     if (pLS < pRS):
         if (pLS <= pThresh):
+            print("left side dark, check right")
+            front = half
+            half = (half + back) // 2            
+        elif (pRSRE <= pThresh):
+            print("left side darker, but edge on right")
+            front = half
+            half = (half + back) // 2  
+        else:
+            print("left side darker")
+            back = half
+            half = (front + half) // 2
+    elif (pRS < pLS):
+        if (pRS <= pThresh):
+            print("right side dark, check left")
+            back = half
+            half = (front + half) // 2
+        elif (pLSLE <= pThresh):
+            print("right side darker, but edge on left")
+            back = half
+            half = (front + half) // 2 
+        else:
+            print("right side darker")
+            front = half
+            half = (half + back) // 2
+
+    return binaryOpeningSearch(img, front, half, back)
+
+
+    """if (pLS < pRS):
+        if (pLS <= pThresh):
+            print("left side dark, check right")
             front = half
             half = (half + back) // 2
             
             return binaryOpeningSearch(img, front, half, back)
-        
+        print("left side darker")
         back = half
         half = (front + half) // 2
 
@@ -156,17 +219,19 @@ def binaryOpeningSearch(img, start, middle, end, pThresh = 0.5):
 
     elif (pRS < pLS):
         if (pRS <= pThresh):
+            print("right side dark, check left")
             back = half
             half = (front + half) // 2
 
             return binaryOpeningSearch(img, front, half, back)
 
+        print("right side darker")
         front = half
         half = (half + back) // 2
 
         return binaryOpeningSearch(img, front, half, back)
-
-a = tPC
+"""
+a = tPO
 _, w = np.shape(a)
 a = binaryOpeningSearch(a, 1, w // 2, w)
 print(a)
