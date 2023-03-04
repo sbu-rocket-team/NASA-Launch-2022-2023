@@ -83,6 +83,8 @@ def executeInstructions(instructionList, timeOn):
     listLen = len(tempList)
     timeTaken = None
     
+    # I didnt see anything that raised the RP, so added this
+    motF.raiseRack()
 
     while listLen > 0:
         instrCase = tempList.pop()

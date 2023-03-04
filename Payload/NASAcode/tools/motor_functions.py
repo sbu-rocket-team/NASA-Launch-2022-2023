@@ -129,16 +129,16 @@ def raiseRack():
 def testRack():
     # This will raise the camera up, and then set it down.
 
-    time_up = 0.5
+    time_up = 0.25
     time_diff = 0.05
 
-    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP)
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP,101)
     time.sleep(time_up)
     off(po.RP_DIR, po.RP_PWM)    
 
     time.sleep(1)
 
-    motorON2(po.RP_DIR, po.RP_PWM, po.RP_DOWM)
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_DOWN,101)
     time.sleep(time_up - time_diff)
     off(po.RP_DIR, po.RP_PWM)
 

@@ -154,14 +154,14 @@ def rotateTest():
     # Testing out the rotation capabilities of the stuffs
     currentDegree = 0
     currentDegree = rotateCam("R", currentDegree, 60)
-    sleep(0.5)
+    time.sleep(0.5)
     currentDegree = rotateCam("L", currentDegree, 60)
-    sleep(0.5)
+    time.sleep(0.5)
     # Should be at original location low
 
     currentDegree = rotateCam("L", currentDegree, 60)
-    sleep(0.5)
+    time.sleep(0.5)
     currentDegree = rotateCam("R", currentDegree, 60)
-    sleep(0.5)
+    time.sleep(0.5)
 
     # and then should be back at zero again :)
