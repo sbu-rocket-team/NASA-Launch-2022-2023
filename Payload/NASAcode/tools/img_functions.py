@@ -163,24 +163,25 @@ TODO: DOCUMENT
 - inverted : 
 """
 def processIMG(img, timeStamp, filter, flip):
-    filterText = ""
+   filterText = ""
 
-    if (flip):
-       filterText += " flipped"
-       img = cv2.flip(img, 0)
+   if (filter == "N"):
+      filterText = "Normal"
+   elif (filter == "G"):
+      filterText = "Greyscale"
+      img = cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+   elif (filter == "C"):
+      filterText = "(Normal, (Saturated/Brightened, Greyscale) + Inversed) * Rotated"
+      img = fourFilters(img)
+   
+   
+   if (flip):
+      filterText += " & Flipped"
+      img = cv2.flip(img, 0)
 
-    if (filter == "N"):
-        filterText = "Normal"
-    elif (filter == "G"):
-        filterText = "Greyscale"
-        img = cv2.cvtColor(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
-    elif (filter == "C"):
-       filterText = "(Normal, (Saturated/Brightened, Greyscale) + Inversed) * Rotated"
-       img = fourFilters(img)
+   img = stampImg(img, timeStamp, filterText)
 
-    img = stampImg(img, timeStamp, filterText)
-
-    return img
+   return img
 
 """
 DOCUMENT TODO

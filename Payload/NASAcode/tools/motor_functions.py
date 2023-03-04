@@ -32,7 +32,7 @@ Parameters:
 - intSped [int]: Starting speed of the motor, if no endSpd is specified is also the settled speed
 - endSped [int]: Settling speed of the motor, 
 """
-def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1, FREQ = 120, MIN_SPD = 40):
+def motorON(pPin, ePin, direction, intSpd=100, endSpd=-1, time=-1, FREQ = 120, MIN_SPD = 40):
     pwm = None
 
     if (endSpd == -1):
@@ -40,12 +40,12 @@ def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1, FREQ = 120, MIN_S
 
     if (intSpd >= MIN_SPD):
         if (direction == "R"):
-            GPIO.output(pPin, po.ROT_RIGHT)
+            GPIO.output(pPin, 1)
             #GPIO.output(pPin, po.ROT_RIGHT)
             #pwm = GPIO.PWM(ePin, FREQ)
             #pwm.start(intSpd)
         elif (direction == "L"):
-            GPIO.output(pPin, po.ROT_LEFT)
+            GPIO.output(pPin, 0)
             #GPIO.output(pPin, po.ROT_LEFT)
             #pwm = GPIO.PWM(ePin, FREQ)
             #pwm.start(intSpd)
@@ -120,11 +120,30 @@ def off(direction, pwm):
 
     GPIO.output(pins, GPIO.LOW)  
 
-def raiseRack():
+def moveRack(direction, timeOn = 0.5):
+    if (direction == "U"):
+        motorON(po.RP_DIR, po.RP_PWM, "L")
+    elif (direction == "D"):
+        motorON(po.RP_DIR, po.RP_PWM, "R")
+    time.sleep(timeOn)
+    motorOff(po.RP_PWM)
+
+    """
     time_up = 0.5
     motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP,101)
     time.sleep(time_up)
     off(po.RP_DIR, po.RP_PWM)
+    """
+
+def moveLeadscrew(direction, timeOn = 20):
+    if (direction == "O"):
+        motorON(po.LEADSCREW_DIR, po.LEADSCREW_PWM, "L")
+    elif (direction == "C"):
+        motorON(po.LEADSCREW_DIR, po.LEADSCREW_PWM, "R")
+    time.sleep(timeOn)
+    motorOff(po.LEADSCREW_PWM)
+
+    
 
 def testRack():
     # This will raise the camera up, and then set it down.

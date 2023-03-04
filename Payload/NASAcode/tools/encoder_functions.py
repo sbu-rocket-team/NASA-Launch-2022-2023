@@ -71,17 +71,21 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
 
     reqCounter = round(degree * CPD) - COUNTDELAY
     
-    if (direction == "R"):
-        newDegree = currentAngle + degree
-        if (abs(newDegree) > MAXROT):
-            reverseDir = True
+    if (not (degree >= 180)):
+        if (direction == "R"):
+            newDegree = currentAngle + degree
+            if (abs(newDegree) > MAXROT):
+                reverseDir = True
         
-    elif (direction == "L"):
-        newDegree = currentAngle - degree
-        if (abs(newDegree) > MAXROT):
-            reverseDir = True
-    
-    returnDegree = newDegree
+        elif (direction == "L"):
+            newDegree = currentAngle - degree
+            if (abs(newDegree) > MAXROT):
+                reverseDir = True
+        returnDegree = newDegree
+    elif (currentAngle >= abs(180)):
+        if (direction == "R"):
+
+            newDegree = 360 - degree
     
     if (reverseDir):
         if (direction == "R"):
@@ -93,8 +97,6 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
         
         degreeDif = abs(returnDegree) + abs(currentAngle)
         reqCounter = round(degreeDif * CPD) - COUNTDELAY
-
-
     
     """    
     if ((degree > 180) and (abs(currentAngle) != 180)):
