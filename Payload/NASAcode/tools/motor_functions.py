@@ -130,7 +130,7 @@ def moveRack(direction, timeOn = 0.5):
 
     """
     time_up = 0.5
-    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP)
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP,101)
     time.sleep(time_up)
     off(po.RP_DIR, po.RP_PWM)
     """

@@ -217,6 +217,7 @@ while (not finishedTask):
     
     instr1 = txtF.readFile(RADIOTEXT)
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
+    #KQ4CTL C3 D4 A1 C3 G7 A1 A1 C3 A1 E5 C3 F6 C3 D4 A1 C3 G7 C3 A1 F6 E5 C3
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
     receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
     txtF.writeFile(OUTPUTTEXT, receivedText)
