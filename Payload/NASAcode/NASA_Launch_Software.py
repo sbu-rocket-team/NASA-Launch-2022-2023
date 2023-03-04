@@ -82,9 +82,9 @@ def executeInstructions(instructionList, timeOn):
     tempList = instructionList[:]
     listLen = len(tempList)
     timeTaken = None
+    currentDegree = 0
     
-    # I didnt see anything that raised the RP, so added this
-    motF.raiseRack()
+    
 
     while listLen > 0:
         instrCase = tempList.pop()
@@ -97,9 +97,9 @@ def executeInstructions(instructionList, timeOn):
 
         elif(instrCase == "C3"): # Take picture, but honestly this might do everything lol
             if (relCamRot > 0):
-                encF.rotateCam("R", abs(relCamRot)) # idk direction
+                currentDegree = encF.rotateCam("R", currentDegree, abs(relCamRot)) # idk direction
             elif (relCamRot < 0):
-                encF.rotateCam("L", abs(relCamRot))  # idk direction
+                currentDegree = encF.rotateCam("L", currentDegree, abs(relCamRot))  # idk direction
 
             timeTaken = misF.timeElapsed(timeOn, time.time())
             imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
@@ -215,7 +215,12 @@ txtF.createFile(OUTPUTTEXT)
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
     
+    # I didnt see anything that raised the RP, so added this
+    motF.raiseRack()
+
     instr1 = txtF.readFile(RADIOTEXT)
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
+    #KQ4CTL C3 D4 A1 C3 G7 A1 A1 C3 A1 E5 C3 F6 C3 D4 A1 C3 G7 C3 A1 F6 E5 C3
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
     receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
     txtF.writeFile(OUTPUTTEXT, receivedText)
