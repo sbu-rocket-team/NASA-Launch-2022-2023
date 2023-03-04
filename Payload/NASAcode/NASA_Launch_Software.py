@@ -29,15 +29,6 @@ hasFlown = False
 deployed = False
 finishedTask = False
 
-# Image Filters
-imgCount = 0
-filterType = "N"
-flipPic = False
-flipCounter = 0
-
-# Camera rotations
-relCamRot = 0
-
 # Threshold values
 IMG_BRIGHTNESS_TH = 10
 FALL_VELOCITY_TH = -5
@@ -71,18 +62,25 @@ gryoStart = None
 Document/FINISH TODO
 """
 def executeInstructions(instructionList, timeOn):
-    global flipCounter
-    global flipPic
-    global relCamRot
-    global imgCount
-    global filterType
-    global SAVEDIMAGES_DIR  # actual
+    global SAVEDIMAGES_DIR
     global OUTPUTTEXT
+
+    # Image Filters
+    imgCount = 0
+    filterType = "N"
+    flipPic = False
+    flipCounter = 0
+
+    # Camera rotations
+    relCamRot = 0
+    currentDegree = 0
+    
+    # Image time logging
+    timeTaken = None
+    
 
     tempList = instructionList[:]
     listLen = len(tempList)
-    timeTaken = None
-    
 
     while listLen > 0:
         instrCase = tempList.pop()
@@ -95,9 +93,9 @@ def executeInstructions(instructionList, timeOn):
 
         elif(instrCase == "C3"): # Take picture, but honestly this might do everything lol
             if (relCamRot > 0):
-                encF.rotateCam("R", abs(relCamRot)) # idk direction
+                currentDegree = encF.rotateCam("R", currentDegree, abs(relCamRot))
             elif (relCamRot < 0):
-                encF.rotateCam("L", abs(relCamRot))  # idk direction
+                currentDegree = encF.rotateCam("L", currentDegree, abs(relCamRot))
 
             timeTaken = misF.timeElapsed(timeOn, time.time())
             imgName = imgF.getImgName(timeTaken, filterType, flipPic, imgCount)
@@ -212,6 +210,10 @@ txtF.createFile(OUTPUTTEXT)
 
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
+
+    motF.moveRack("U", 0.25)
+    time.sleep(1)
+    motF.moveRack("D", 0.25)
     
     instr1 = txtF.readFile(RADIOTEXT)
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
