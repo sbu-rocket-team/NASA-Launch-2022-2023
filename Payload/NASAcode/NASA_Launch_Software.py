@@ -193,6 +193,8 @@ while (hasFlown and deployed and (not finishedTask)):
     eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
 
     matching, differences = instF.compareInstructions(eventList1_1, eventList1_2)
+    
+    # Add in raising rack and pinion
 
     if (matching and (differences <= 2)):
         executeList = eventList1_1
