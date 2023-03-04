@@ -211,11 +211,12 @@ txtF.createFile(OUTPUTTEXT)
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
 
-    motF.moveRack("U", 0.25)
-    time.sleep(1)
-    motF.moveRack("D", 0.25)
+    motF.moveRack("U", 0.5)
+    camF.takePic("testicles.jpg", directory = SAVEDIMAGES_DIR)
+    motF.moveRack("D", 0.5)
     
     instr1 = txtF.readFile(RADIOTEXT)
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
     receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
     txtF.writeFile(OUTPUTTEXT, receivedText)
@@ -232,6 +233,34 @@ while (not finishedTask):
     timeOff = misF.timeElapsed(timeOn, time.time())
     timeOff = "\nTotal Runtime is... " + timeOff
     txtF.writeFile(OUTPUTTEXT, timeOff)
+
+"""
+while (not finishedTask):
+    # get radio signal... read from txt file hopefully
+
+    motF.moveRack("U", 0.25)
+    time.sleep(1)
+    motF.moveRack("D", 0.25)
+    
+    instr1 = txtF.readFile(RADIOTEXT)
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
+    receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
+    txtF.writeFile(OUTPUTTEXT, receivedText)
+    txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
+
+    eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
+
+    executeList = eventList1_1
+
+    executeInstructions(executeList, timeOn)
+    
+    finishedTask = True
+
+    timeOff = misF.timeElapsed(timeOn, time.time())
+    timeOff = "\nTotal Runtime is... " + timeOff
+    txtF.writeFile(OUTPUTTEXT, timeOff)
+"""
 
     # what if record for 8 mins... get 3 readings
     # compare the 3 readings
