@@ -78,7 +78,6 @@ def executeInstructions(instructionList, timeOn):
     # Image time logging
     timeTaken = None
     
-
     tempList = instructionList[:]
     listLen = len(tempList)
 
@@ -133,7 +132,8 @@ def executeInstructions(instructionList, timeOn):
 
         listLen = len(tempList)
 
-"""#main tasks
+"""
+#main tasks
 timeOn = time.time()
 txtF.createFile(ACCELOUTPUT)
 txtF.createFile(GYROOUTPUT)

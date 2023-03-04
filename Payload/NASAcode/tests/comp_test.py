@@ -7,11 +7,11 @@ t = time.localtime()
 current_time = time.strftime("%H:%M:%S", t)
 print("Current time: " + current_time)
 
-#   Known to be working.
+#   Known to be working. (Not anymore lol)
 #
 #   # Testing Camera Functions
 #   from NASAcode.tools import cam_functions as camF
-#   
+#   print("Testing Camera function")
 #   camera =camF.initializeCam((2560,1440))
 #   
 #   fileName = "1440pTest-"+current_time+".jpeg"
@@ -26,7 +26,7 @@ from mpu6050 import mpu6050
 from NASAcode.tools import mpu_functions as mpuF, misc_functions as miscF, setup_gpio as sg
 
 print("Setting up MPU")
-MPU = mpu6050(0x68)
+#MPU = mpu6050(0x68) # This may be bugging it up. 
 sg.setup()
 
 time_delay = 1
@@ -45,7 +45,7 @@ while(i < maxi):
     sleep(1/samplerate)
     i += 1
 avg = sum(samples)/(len(samples))
-print("MPU readings obtained, average acceleration: " + avg + " over " + time_delay + " seconds.")
+print("MPU readings obtained, average acceleration: " + str(avg) + " over " + str(time_delay) + " seconds.")
 
 # Testing raising and lowering rack and pinion
 from NASAcode.tools import motor_functions as motF
