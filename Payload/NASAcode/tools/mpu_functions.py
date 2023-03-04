@@ -6,11 +6,11 @@ Edited By: Ethan Carr
 """
 import time
 
-import mpu6050 as imu
+from mpu6050 import mpu6050
 
 import numpy as np
 
-MPU = imu.mpu6050(0x68)
+MPU = mpu6050(0x68)
 
 """""
 MPU 6050
@@ -55,7 +55,7 @@ def getAccelGyroMagVal(Acceleration=True, Gyro=True):
     elif (Gyro):
         return gyroMag
     else:
-        return None;
+        return None
 
 # what this for???
 def getAccelVal():

@@ -19,7 +19,7 @@ def encoderTest(time):
     prev = 0
     for i in range(samplerate):
         sleep(time/samplerate)
-        val = sg.GPIO.input(p.ROT_DIR)
+        val = sg.GPIO.input(p.ENCODER)
         if(val == 1 & val != prev):
             ct += 1
         
@@ -31,11 +31,12 @@ def encoderTest(time):
 #encoderTest(1)
 
 def encoderTest2(cts):
+    fudge = 40
     mc.run_test(p.ROT_DIR, p.ROT_PWM)
     ct = 0
     prev = 0
-    while(ct < cts):
-        val = sg.GPIO.input(p.ROT_DIR)
+    while(ct < (cts-fudge)):
+        val = sg.GPIO.input(p.ENCODER)
         if(val == 1 & val != prev):
             ct += 1
         
@@ -43,20 +44,22 @@ def encoderTest2(cts):
     mc.off(p.ROT_DIR, p.ROT_PWM)
 
 #encoderTest2(1281)
+#encoderTest2(6300/6)
 
 def encoderTest2_2(cts):
     mc.motorON(p.ROT_DIR, p.ROT_PWM, "L", 50)
     ct = 0
     prev = 0
     while(ct < cts):
-        val = sg.GPIO.input(p.ROT_DIR)
+        val = sg.GPIO.input(p.ENCODER)
         if(val == 1 & val != prev):
             ct += 1
+            print(ct)
         
         prev = val
     mc.motorOff(p.ROT_PWM)
 
-encoderTest2_2(1281)
+#encoderTest2_2(1281)
 
 ct = 0
 rct = 0
@@ -70,7 +73,7 @@ def readEncoder(pin):
             if sg.GPIO.input(pin) == sg.GPIO.HIGH:
                 ct += 1
 
-sg.GPIO.add_event_detect(p.ROT_DIR, sg.GPIO.RISING, callback=readEncoder)
+#sg.GPIO.add_event_detect(p.ROT_DIR, sg.GPIO.RISING, callback=readEncoder)
 
 def encoderTest3(cts):
     turnOff = True
@@ -84,7 +87,7 @@ def encoderTest3(cts):
             mc.off(p.ROT_ENABLE, p.ROT_PWM)
             turnOff = False
             
-encoderTest3()
+#encoderTest3()
 
 currentDegree = 0
 
@@ -95,17 +98,37 @@ def encoderTest4():
     print(currentDegree)
 
 def encoderTest5():
-    global currentDegree
+    currentDegree = 0
+
     print(currentDegree)
-    currentDegree = encF.rotateCam("R", currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree, 360)
+    sleep(1)
     print(currentDegree)
-    currentDegree = encF.rotateCam("R", currentDegree)
+    currentDegree = encF.rotateCam("L", currentDegree, 180)
+    sleep(1)
     print(currentDegree)
-    currentDegree = encF.rotateCam("R", currentDegree)
+    sleep(1)
     print(currentDegree)
-    currentDegree = encF.rotateCam("R", currentDegree)
+    currentDegree = encF.rotateCam("R", currentDegree, 60)
+    sleep(1)
     print(currentDegree)
-    currentDegree = encF.rotateCam("R", currentDegree)
+    currentDegree = encF.rotateCam("L", currentDegree, 180)
+    sleep(1)
     print(currentDegree)
+    sleep(1)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("L", currentDegree, 240)
+    sleep(1)
+    print(currentDegree)
+    currentDegree = encF.rotateCam("L", currentDegree, 300)
+    sleep(1)
+    print(currentDegree)
+ 
+
+print("motor on")
+
+encoderTest5()
+
+print("motor off")
 
 sg.cleanup()

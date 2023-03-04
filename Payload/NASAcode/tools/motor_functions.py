@@ -3,6 +3,7 @@ import time
 import RPi.GPIO as GPIO
 
 from NASAcode.tools import setup_gpio
+from NASAcode.tools import pinout as po
 
 FREQ = 120
 MIN_SPD = 40
@@ -31,11 +32,7 @@ Parameters:
 - intSped [int]: Starting speed of the motor, if no endSpd is specified is also the settled speed
 - endSped [int]: Settling speed of the motor, 
 """
-def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1):
-    global FREQ
-    global MIN_SPD
-
-    GPIO.output(ePin, 1)
+def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1, FREQ = 120, MIN_SPD = 40):
     pwm = None
 
     if (endSpd == -1):
@@ -43,14 +40,17 @@ def motorON(pPin, ePin, direction, intSpd, endSpd=-1, time=-1):
 
     if (intSpd >= MIN_SPD):
         if (direction == "R"):
-            GPIO.output(pPin, 0)
-            pwm = GPIO.PWM(ePin, FREQ)
-            pwm.start(intSpd)
+            GPIO.output(pPin, po.ROT_RIGHT)
+            #GPIO.output(pPin, po.ROT_RIGHT)
+            #pwm = GPIO.PWM(ePin, FREQ)
+            #pwm.start(intSpd)
         elif (direction == "L"):
-            GPIO.output(pPin, 1)
-            pwm = GPIO.PWM(ePin, FREQ)
-            pwm.start(intSpd)
-        changeSpd(pwm, intSpd, endSpd)
+            GPIO.output(pPin, po.ROT_LEFT)
+            #GPIO.output(pPin, po.ROT_LEFT)
+            #pwm = GPIO.PWM(ePin, FREQ)
+            #pwm.start(intSpd)
+        #changeSpd(pwm, intSpd, endSpd)
+        GPIO.output(ePin, 1)
 
     return pwm
 """
@@ -119,3 +119,29 @@ def off(direction, pwm):
     pins = [direction, pwm]          
 
     GPIO.output(pins, GPIO.LOW)  
+
+def raiseRack():
+    time_up = 0.5
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP)
+    time.sleep(time_up)
+    off(po.RP_DIR, po.RP_PWM)
+
+def testRack():
+    # This will raise the camera up, and then set it down.
+
+    time_up = 0.5
+    time_diff = 0.05
+
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP)
+    time.sleep(time_up)
+    off(po.RP_DIR, po.RP_PWM)    
+
+    time.sleep(1)
+
+    motorON2(po.RP_DIR, po.RP_PWM, po.RP_DOWM)
+    time.sleep(time_up - time_diff)
+    off(po.RP_DIR, po.RP_PWM)
+
+
+
+

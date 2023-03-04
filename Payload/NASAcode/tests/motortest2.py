@@ -1,4 +1,4 @@
-from tools import pinout, setup_gpio, motor_functions as mc
+from NASAcode.tools import pinout, setup_gpio, motor_functions as mc
 from time import sleep
 
 setup_gpio.setup()
