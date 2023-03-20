@@ -211,41 +211,39 @@ timeOn = time.time()
 txtF.createFile(OUTPUTTEXT)
 
 # Lil general pad delay
-time.sleep(20)
+#time.sleep(20)
 
 
 # I need to do something here to make it start the timer once 
-done = False
-while(done != True):
-    time_delay = 1
-    samplerate = 100 # hz
-    maxi = samplerate * time_delay
-    samples = []
-    i = 0
-    while(i < maxi):
-        reading = mpuF.getAccelVal()
-        #print(reading)
-        samples.append(reading)
-        if abs(reading) > 15:
-           miscF.beepON()
-        else:
-            miscF.beepOFF()
-        time.sleep(1/samplerate)
-        i += 1
-    avg = sum(samples)/len(samples)
-    standdev = statistics.stdev(samples)
-    print(str(avg) + ", " + str(standdev))
-    if(standdev >= 7.5):
-        done = True
+#done = False
+#while(done != True):
+#    time_delay = 1
+#    samplerate = 30 # hz
+#    maxi = samplerate * time_delay
+#    samples = []
+#    i = 0
+#    while(i < maxi):
+#        reading = mpuF.getAccelVal()
+#        samples.append(reading)
+#        if abs(reading) > 15:
+#           miscF.beepON()
+#        else:
+#            miscF.beepOFF()
+#        sleep(1/samplerate)
+#        i += 1
+#    avg = sum(samples)/len(samples)
+#    standdev = statistics.stdev(samples)
+#    print(str(avg) + ", " + str(standdev))
+#    if(standdev >= 7.5):
+#        done = True
 
 
-time.sleep(180) # Wait until the rocket's launched
+time.sleep(120) # Wait until the rocket's launched
 
 motF.motorON2(dir,pwm,p.LEADSCREW_OPEN,101)
 time.sleep(30)
 motF.off(dir,pwm)
-
-time.sleep(10)
+time.sleep(5)
 
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
