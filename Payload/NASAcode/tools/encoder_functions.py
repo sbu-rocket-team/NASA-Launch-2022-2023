@@ -63,7 +63,7 @@ Parameters:
 def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin = po.ENCODER, encoderMotorPhase = po.ROT_DIR, encoderMotorEnable = po.ROT_PWM):
     
     degree = degree % 360
-    log.log(0,TARGET,"Rotating " + direction + " " + str(degree))
+    log.log(0,TARGET,"Rotating " + str(direction) + " " + str(degree))
     
 
     global CPD
@@ -102,7 +102,7 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
         degreeDif = abs(returnDegree) + abs(currentAngle)
         reqCounter = round(degreeDif * CPD) - COUNTDELAY
     
-    log.log(0,TARGET,"Calculated counts to turn for "+ str(degree)+" degrees: "+ reqCounter)
+    log.log(0,TARGET,"Calculated counts to turn for "+ str(degree)+" degrees: "+ str(reqCounter))
 
     """    
     if ((degree > 180) and (abs(currentAngle) != 180)):

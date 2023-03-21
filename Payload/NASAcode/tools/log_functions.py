@@ -11,25 +11,29 @@ WARNING = 1
 ERROR = 2
 
 # Location of log files
-MAIN_LOGDIR = "logs"
+MAIN_LOGDIR = "../logs"
 MAIN_LOG = "payload"+date+".log"
 
 # Ensuring the daily log is created and available
 direc = MAIN_LOGDIR+"/"+MAIN_LOG
-if(os.path.exists()==False):
+full_dir = "/home/pi/NASAcode/"+str(direc[2:])
+if(os.path.exists(full_dir)==False):
+   print("New log created! " + full_dir)
    txtF.createFile(direc)
 
 
 def log(level,target,message):
     ti = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     level = enum2str(level)
-    dat = ti + " | " + level + " | " + str.upper(target) + " | " + message
+    dat = str(ti) + " | " + str(level) + " | " + str.upper(target) + " | " + str(message)
 
     print(dat)
     txtF.writeFile(direc,dat)
     return dat
 
-
+def blank():
+    print("")
+    txtF.writeFile(direc,"")
 
 def enum2str(level):
     if(level == 0):

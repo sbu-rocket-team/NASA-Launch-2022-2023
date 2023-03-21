@@ -64,9 +64,9 @@ def pin2string(pin):
 
 def dir2string(pin,dir):
     if(pin == ROT_PWM):
-        if(dir == ROT_LEFT):
+        if(dir == ROT_LEFT or dir == "L"):
             return "left"
-        elif(dir == ROT_RIGHT):
+        elif(dir == ROT_RIGHT or dir == "R"):
             return "right"
     elif(pin == LEADSCREW_PWM):
         if(dir == LEADSCREW_CLOSE):

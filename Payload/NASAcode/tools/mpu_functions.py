@@ -12,7 +12,7 @@ import numpy as np
 MPU = mpu6050(0x68)
 time.sleep(1)
 TARGET = "MPU-6050" # For identifying logs
-log.log(0,TARGET,"MPU Started.")
+log.log(0,TARGET,"MPU Initialized.")
 
 """""
 MPU 6050

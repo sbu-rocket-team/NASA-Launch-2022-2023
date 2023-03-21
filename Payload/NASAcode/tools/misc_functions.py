@@ -5,7 +5,7 @@ from gpiozero import CPUTemperature as CPUTemp
 from NASAcode.tools import pinout
 from NASAcode.tools import setup_gpio as sg
 from NASAcode.tools.setup_gpio import GPIO
-from NASAcode.tools import mpu_functions as mpuF
+
 
 """
 Gets the time that passed since start of program in hr:min:sec
@@ -29,6 +29,7 @@ def timeElapsed(timeStart, timeRef):
     return timeStr
 
 def overheat(temp):
+    from NASAcode.tools import mpu_functions as mpuF
     if (CPUTemp() >= temp):
         time.sleep(10)
 

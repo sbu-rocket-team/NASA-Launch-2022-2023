@@ -6,9 +6,9 @@
 
 # Variables
 timeout_val=${1:-5}
-freq = ${2:-146.470M}
-samples = ${3:-15000}
-gain = ${4:-20}
+freq=${2:-146.470M}
+samples=${3:-15000}
+gain=${4:-20}
 
 # Record the audio from rtl_fm, using demod thru rtl
 timeout $timeout_val rtl_fm -f $freq -M fm -s $samples -r $samples -T -E dc | sox -t raw -e signed -c 1 -b 16 -r $samples  - recording146470.wav 
