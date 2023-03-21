@@ -5,13 +5,14 @@ Written By: Jewick Shi
 Edited By: Ethan Carr
 """
 import time
-
 from mpu6050 import mpu6050
-
+from NASAcode.tools import log_functions as log
 import numpy as np
 
 MPU = mpu6050(0x68)
 time.sleep(1)
+TARGET = "MPU-6050" # For identifying logs
+log.log(0,TARGET,"MPU Initialized.")
 
 """""
 MPU 6050
@@ -29,8 +30,12 @@ z ... length of the rocket
 """
 DOCUMENT
 """
+
+
 def getMPUTemp():
-    return MPU.get_temp()
+    temp = MPU.get_temp()
+    log.log(0,TARGET,"Measured temp: " + str(temp))
+    return temp
 
 """
 Gets the magnitude of the acceleration and angular vectors.
@@ -185,3 +190,20 @@ def getGyro(xComp=True, yComp=True, zComp=True):
         return gyro["z"]
     else:
         return None
+    
+def mpuTest():
+    log.log(0,TARGET,"Starting MPU test")
+    time_delay = 1
+    samplerate = 30 # hz
+    maxi = samplerate * time_delay
+    samples = []
+    i = 0
+    while(i < maxi):
+        reading = getAccelVal()
+        samples.append(reading)
+
+        time.sleep(1/samplerate)
+        i += 1
+    avg = sum(samples)/(len(samples))
+    log.log(0,TARGET,"MPU readings obtained, average acceleration: " + str(avg) + " over " + str(time_delay) + " seconds.")
+    return avg

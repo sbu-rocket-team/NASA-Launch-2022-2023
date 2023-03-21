@@ -9,7 +9,9 @@ import time
 import RPi.GPIO as GPIO
 import matplotlib.pyplot as plt
 
-from NASAcode.tools import motor_functions as motF, pinout as po
+from NASAcode.tools import motor_functions as motF, pinout as po, log_functions as log
+
+TARGET = "Rotation"
 
 """https://www.pololu.com/product/4761"""
 
@@ -59,9 +61,10 @@ Parameters:
 - direction [char]: "R"ight, "L"eft
 """
 def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin = po.ENCODER, encoderMotorPhase = po.ROT_DIR, encoderMotorEnable = po.ROT_PWM):
-    #print("Rotating", direction, degree)
+    
     degree = degree % 360
-    #print("Actual rotation:", degree)
+    log.log(0,TARGET,"Rotating " + str(direction) + " " + str(degree))
+    
 
     global CPD
     global MAXROT
@@ -71,6 +74,7 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
 
     reqCounter = round(degree * CPD) - COUNTDELAY
     
+
     if (not (degree >= 180)):
         if (direction == "R"):
             newDegree = currentAngle + degree
@@ -98,6 +102,8 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
         degreeDif = abs(returnDegree) + abs(currentAngle)
         reqCounter = round(degreeDif * CPD) - COUNTDELAY
     
+    log.log(0,TARGET,"Calculated counts to turn for "+ str(degree)+" degrees: "+ str(reqCounter))
+
     """    
     if ((degree > 180) and (abs(currentAngle) != 180)):
         if (direction == "R"):
@@ -145,25 +151,26 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
     
     #while (counter < reqCounter):
     #    GPIO.add_event_detect(encoderPin, GPIO.RISING, callback=readEncoder)
+    log.log(0,TARGET,"Starting rotation")
     motF.motorON(encoderMotorPhase, encoderMotorEnable, direction, 100)
     readEncoder(po.ENCODER, reqCounter)
     motF.motorOff(po.ROT_PWM) # turn off motor
-    print()
+    log.log(0,TARGET,"Rotation completed, "+str(degree)+" degrees.")
     return returnDegree
 
 
 def rotateTest():
     # Testing out the rotation capabilities of the stuffs
     currentDegree = 0
-    currentDegree = rotateCam("R", currentDegree, 60)
-    time.sleep(0.5)
-    currentDegree = rotateCam("L", currentDegree, 60)
-    time.sleep(0.5)
-    # Should be at original location low
-
-    currentDegree = rotateCam("L", currentDegree, 60)
-    time.sleep(0.5)
-    currentDegree = rotateCam("R", currentDegree, 60)
-    time.sleep(0.5)
+    currentDegree = rotateCam("R", currentDegree, 20)
+    time.sleep(0.25)
+    currentDegree = rotateCam("L", currentDegree, 20)
+    time.sleep(0.25)
+    
+    # Should be at original location now
+    currentDegree = rotateCam("L", currentDegree, 20)
+    time.sleep(0.25)
+    currentDegree = rotateCam("R", currentDegree, 20)
+    time.sleep(0.25)
 
     # and then should be back at zero again :)

@@ -4,9 +4,10 @@ import RPi.GPIO as GPIO
 
 from NASAcode.tools import setup_gpio
 from NASAcode.tools import pinout as po
-
+from NASAcode.tools import log_functions as log
 FREQ = 120
 MIN_SPD = 40
+TARGERT = "Motors"
 # https://www.pololu.com/product/2135
 
 setup_gpio.setup()
@@ -33,6 +34,7 @@ Parameters:
 - endSped [int]: Settling speed of the motor, 
 """
 def motorON(pPin, ePin, direction, intSpd=100, endSpd=-1, time=-1, FREQ = 120, MIN_SPD = 40):
+    log.log(0,TARGERT,"Turning on motor: " + po.pin2string(ePin) + ", "+po.dir2string(ePin,direction))
     pwm = None
 
     if (endSpd == -1):
@@ -82,6 +84,7 @@ def motorON2(dir_pin, pwm_pin, direction, speed=100):
 
 def motorOff(ePin):
     GPIO.output(ePin, 0)
+    log.log(0,TARGERT,"Turning off motor " + po.pin2string(ePin))
 
 """
 DOCUMENT TODO
@@ -114,11 +117,12 @@ def run_test(enable, phase):
     pins = [enable, phase]            
     GPIO.output(pins, GPIO.HIGH)
 
+
      
 def off(direction, pwm):
     pins = [direction, pwm]          
-
     GPIO.output(pins, GPIO.LOW)  
+    log.log(0,TARGERT,"Turning off motor " + po.pin2string(pwm))
 
 def moveRack(direction, timeOn = 0.5):
     if (direction == "U"):
@@ -147,20 +151,33 @@ def moveLeadscrew(direction, timeOn = 20):
 
 def testRack():
     # This will raise the camera up, and then set it down.
-
+    #log.log(0,TARGERT,"Testing rack and pinion")
     time_up = 0.25
     time_diff = 0.05
 
-    motorON2(po.RP_DIR, po.RP_PWM, po.RP_UP,101)
+    motorON(po.RP_DIR, po.RP_PWM, po.RP_UP)
     time.sleep(time_up)
     off(po.RP_DIR, po.RP_PWM)    
 
     time.sleep(1)
 
-    motorON2(po.RP_DIR, po.RP_PWM, po.RP_DOWN,101)
+    motorON(po.RP_DIR, po.RP_PWM, po.RP_DOWN)
     time.sleep(time_up - time_diff)
     off(po.RP_DIR, po.RP_PWM)
 
 
+def testLeads():
+    # This will open for 1 second, close for 1 second
+    time_up = 1
+    time_diff = 0
 
+    motorON(po.LEADSCREW_DIR, po.LEADSCREW_PWM, po.LEADSCREW_OPEN)
+    time.sleep(time_up)
+    off(po.LEADSCREW_DIR, po.LEADSCREW_PWM)    
+
+    time.sleep(1)
+
+    motorON(po.LEADSCREW_DIR, po.LEADSCREW_PWM, po.LEADSCREW_CLOSE)
+    time.sleep(time_up - time_diff)
+    off(po.LEADSCREW_DIR, po.LEADSCREW_PWM)
 

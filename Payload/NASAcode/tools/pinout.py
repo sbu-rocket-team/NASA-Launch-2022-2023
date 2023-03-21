@@ -46,3 +46,38 @@ CAM_SCLK = 23
 CAM_CS = 24
 
 
+# For logging stuff.
+
+def pin2string(pin):
+    if(pin == BUZZER):
+        return "Buzzer"
+    elif(pin == LED):
+        return "LED"
+    elif(pin == ROT_PWM):
+        return "Camera rotation"
+    elif(pin == LEADSCREW_PWM):
+        return "Lead screws"
+    elif(pin == RP_PWM):
+        return "Rack + pinion"
+    else:
+        return "Unknown"
+
+def dir2string(pin,dir):
+    if(pin == ROT_PWM):
+        if(dir == ROT_LEFT or dir == "L"):
+            return "left"
+        elif(dir == ROT_RIGHT or dir == "R"):
+            return "right"
+    elif(pin == LEADSCREW_PWM):
+        if(dir == LEADSCREW_CLOSE):
+            return "close"
+        elif(dir == LEADSCREW_OPEN):
+            return "open"
+    elif(pin == RP_PWM):
+        if(dir == RP_DOWN):
+            return "down"
+        elif(dir == RP_UP):
+            return "up"
+    else:
+        return "Unknown"
+    return "Unknown"

@@ -60,7 +60,7 @@ def genRandInstr(teams = 1, length = 1, limit = 8):
             elif(tempRand==8):
                 Instr += "H8"
     
-    Instr = Instr + " " + Instr
+    Instr = Instr #+ " " + Instr
     
     return Instr
 
@@ -97,4 +97,8 @@ def createError(inList, chance = 10):
                 inList[i] = inList[i].lower()
 
 
+<<<<<<< HEAD
 print(genRandInstr(10, 16))
+=======
+print(genRandInstr(teams = 1, length = 25, limit = 8))
+>>>>>>> 513f14afa1fcedf99e21e081d3aa88b8883f1e9e

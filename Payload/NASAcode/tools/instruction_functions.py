@@ -12,7 +12,7 @@ gets 2 instructions out of the radio signal...
 def getInstructionList(inString, callSign):
     tempStr = inString[:]
     tempStr = tempStr.upper()
-
+    
     tempList = tempStr.rsplit(" ")
 
     callSignList = [i for i in tempList if len(i) > 2]
@@ -41,7 +41,7 @@ def getInstructionList(inString, callSign):
         outList2 = tempList[callIndex2+1:nextCallIndex2]
 
     outList2.reverse()
-
+    
     return outList1, outList2
 
 """
