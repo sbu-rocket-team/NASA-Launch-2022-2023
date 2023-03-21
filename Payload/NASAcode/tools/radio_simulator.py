@@ -95,3 +95,6 @@ def createError(inList, chance = 10):
             
             if (random.randint(1,100) <= 50):
                 inList[i] = inList[i].lower()
+
+
+print(genRandInstr(10, 16))

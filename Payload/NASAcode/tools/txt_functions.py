@@ -23,11 +23,15 @@ def createFile(fileName):
     with open(fileLoc, "w") as file: 
         file.write("SBU Rocket Team records... \n")
 
-def writeFile(fileName, fileText):
+def writeFile(fileName, fileText, list=False):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
 
-    text = "\n" + fileText
-
     with open(fileLoc, "a") as file: 
-        file.write(text)
+        if (list):
+            file.write("\n ")
+            for i in range(len(fileText)):
+                file.write(fileText[i] + " ")
+        else:
+            text = "\n" + fileText
+            file.write(text)
