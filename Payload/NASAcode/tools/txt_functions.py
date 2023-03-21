@@ -16,12 +16,12 @@ def readFile(fileName):
 
     return fileData
 
-def createFile(fileName):
+def createFile(fileName,header = "SBU Rocket Team records.\n\n"):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
 
     with open(fileLoc, "w") as file: 
-        file.write("SBU Rocket Team records... \n")
+        file.write(header)
 
 def writeFile(fileName, fileText):
     file_dir = os.path.dirname(os.path.abspath(__file__))

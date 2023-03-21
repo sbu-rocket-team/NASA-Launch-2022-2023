@@ -6,4 +6,3 @@ setup_gpio.setup()
 mf.motorON2(p.RP_DIR, p.RP_PWM, p.RP_UP)
 sleep(0.5)
 mf.off(p.RP_DIR, p.RP_PWM)
-[]

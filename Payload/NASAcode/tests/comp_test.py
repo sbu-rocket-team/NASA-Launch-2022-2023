@@ -1,67 +1,63 @@
 
-import time
-from time import sleep
+# Setting up GPIO and logs stuffs
+from NASAcode.tools import setup_gpio as sg, log_functions as log
+print("Setting up GPIO Pinouts")
+TARGET = "TEST"
+sg.setup()
+
+
 
 # Testing local time for timestamping
-t = time.localtime()
-current_time = time.strftime("%H:%M:%S", t)
-print("Current time: " + current_time)
+import time
+current_time = time.strftime("%H:%M:%S",time.localtime())
+log.log(0,TARGET,"Current time: " + current_time)
 
-#   Known to be working. (Not anymore lol)
-#
-#   # Testing Camera Functions
-#   from NASAcode.tools import cam_functions as camF
-#   print("Testing Camera function")
-#   camera =camF.initializeCam((2560,1440))
-#   
-#   fileName = "1440pTest-"+current_time+".jpeg"
-#   destination = "TestImages"
-#   
-#   camF.takePic(camera, fileName,destination)
-#   print("Image taken! Sent to " + destination + " under " + fileName)
+
+
+# Testing Camera Functions
+from NASAcode.tools import cam_functions as camF
+log.log(0,TARGET,"Testing Camera Functions")
+camF.camTest()
+
+
+
+# Testing Image functions
+from NASAcode.tools import img_functions as imgF
+log.log(0,TARGET,"Testing out Image Functions")
 
 
 # Testing MPU-6050
-from mpu6050 import mpu6050
-from NASAcode.tools import mpu_functions as mpuF, misc_functions as miscF, setup_gpio as sg
+from NASAcode.tools import mpu_functions as mpuF
+log.log(0,TARGET,"Testing MPU-6050 Functions")
+mpuF.mpuTest()
 
-print("Setting up MPU")
-#MPU = mpu6050(0x68) # This may be bugging it up. 
-sg.setup()
 
-time_delay = 1
-samplerate = 30 # hz
-maxi = samplerate * time_delay
-samples = []
-i = 0
-while(i < maxi):
-    reading = mpuF.getAccelVal()
-    samples.append(reading)
-    #print(reading)
-    if abs(reading) > 15:
-        miscF.beepON()
-    else:
-        miscF.beepOFF()
-    sleep(1/samplerate)
-    i += 1
-avg = sum(samples)/(len(samples))
-print("MPU readings obtained, average acceleration: " + str(avg) + " over " + str(time_delay) + " seconds.")
+
+# Testing Radio?
+# from NASAcode.tools.im
+
+
+
+# Testing lead screws?
+from NASAcode.tools import motor_functions as motF
+log.log(0,TARGET,"Testing Lead Screws")
+motF.testLeads()
 
 # Testing raising and lowering rack and pinion
-from NASAcode.tools import motor_functions as motF
-print("Testing Rack and Pinion")
+log.log(0,TARGET,"Testing Rack and Pinion")
 motF.testRack()
 
 
+
 # Testing the camera rotation functions
-print("Testing camera rotation")
-print("R-60, L-60, L-60, R-60")
+log.log(0,TARGET,"Testing camera rotation, R-20, L-20, L-20, R-20")
 from NASAcode.tools import encoder_functions as encF
 encF.rotateTest()
 
 
 
-
+# Testing again buzzers and LED's 
+# (signaling completed test campaign)
 
 
 sg.cleanup()

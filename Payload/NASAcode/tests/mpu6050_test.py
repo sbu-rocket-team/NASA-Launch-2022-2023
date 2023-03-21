@@ -11,7 +11,6 @@
 
 
 from time import sleep #sleep([seconds]) used to pause ... arduino delay()
-from mpu6050 import mpu6050
 from NASAcode.tools import mpu_functions as mpuF, misc_functions as miscF, setup_gpio as sg, txt_functions as txtF
 
 import statistics

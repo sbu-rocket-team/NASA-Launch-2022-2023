@@ -9,11 +9,15 @@ import math
 import cv2
 import numpy as np
 
+from NASAcode.tools import log_functions as log
+
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 
 TEXTFONT = cv2.FONT_HERSHEY_DUPLEX
 TEXTLINE = cv2.LINE_AA
+
+TARGET = "Filters"
 
 """
 Changes the brightness and stauration of an image. The multiplier is applied before the addends.
@@ -162,7 +166,8 @@ TODO: DOCUMENT
 - filter : "N"ormal, "G"reyscale, "C"ustom
 - inverted : 
 """
-def processIMG(img, timeStamp, filter, flip):
+def processIMG(img, timeStamp, filter, flip=False):
+   log.log(0,TARGET,"Processing image, beginning")
    filterText = ""
 
    if (filter == "N"):
@@ -180,7 +185,7 @@ def processIMG(img, timeStamp, filter, flip):
       img = cv2.flip(img, 0)
 
    img = stampImg(img, timeStamp, filterText)
-
+   log.log(0,TARGET,"Image processed.")
    return img
 
 """
@@ -210,3 +215,14 @@ def compareImgs(imgFile1, imgFile2, threshold=0):
       return True
    elif (imgDif <= threshold):
       return False
+   
+
+def testFilters():
+   import time
+   current_time = time.strftime("%H:%M:%S",time.localtime())   
+   log.log(0,TARGET,"Running test suite of filters.")
+   img = cv2.imread(os.path.join("TestImages", "camTest.jpeg"))
+   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "N", True, 690)), processIMG(img,current_time,"N",True))
+   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "G", False, 691)), processIMG(img,current_time,"G"))
+   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "C", False, 692)), processIMG(img,current_time,"C"))
+   

@@ -227,9 +227,9 @@ while(done != True):
         #print(reading)
         samples.append(reading)
         if abs(reading) > 15:
-           miscF.beepON()
+           misF.beepON()
         else:
-            miscF.beepOFF()
+            misF.beepOFF()
         time.sleep(1/samplerate)
         i += 1
     avg = sum(samples)/len(samples)
@@ -241,9 +241,10 @@ while(done != True):
 
 time.sleep(180) # Wait until the rocket's launched
 
-motF.motorON2(dir,pwm,p.LEADSCREW_OPEN,101)
+
+motF.motorON2(po.LEADSCREW_DIR,po.LEADSCREW_PWM,po.LEADSCREW_OPEN,101)
 time.sleep(30)
-motF.off(dir,pwm)
+motF.off(po.LEADSCREW_DIR,po.LEADSCREW_PWM)
 
 time.sleep(10)
 
