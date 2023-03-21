@@ -33,7 +33,7 @@ def radio_test():
     # Testing Radio?
     from NASAcode.tools import radio_functions as radF
     log.log(0,TARGET,"Testing Radio Functions")
-    radF.listen(10)
+    radF.listen(15)
 
 def leads_test():
     # Testing lead screws?
