@@ -110,34 +110,37 @@ Parameters:
 - xComp [Bool]: True if looking for x-component, default False
 - yComp [Bool]: True if looking for y-component, default False
 - zComp [Bool]: True if looking for z-component, default False
-- dt [float]: time difference between velocities
+- dt [int]: time difference between velocities
 
 Returns:
 - xVel [float?]: Average velocity in the x-direction
 - yVel [float?]: Average velocity in the y-direction
 - zVel [float?]: Average velocity in the z-direction
 """
-def getVel(xComp=True, yComp=True, zComp=True, dt=1.0):
+## was actually calculating jerk before ... j = da/dt
+def getVel(xComp=True, yComp=True, zComp=True, dt=1):
+    xVals = []
+    yVals = []
+    zVals = []
     timeRef1 = time.perf_counter()
-    accel = MPU.get_accel_data()
-    xVal1 = accel["x"]
-    yVal1 = accel["y"]
-    zVal1 = accel["z"]
-    time.sleep(dt)
+
+    for i in range(0, dt):
+        accel = MPU.get_accel_data()
+        xVals[i] = accel["x"]
+        yVals[i] = accel["y"]
+        zVals[i] = accel["z"]
+        time.sleep(0.1)
     timeRef2 = time.perf_counter()
-    accel = MPU.get_accel_data()
-    xVal2 = accel["x"]
-    yVal2 = accel["y"]
-    zVal2 = accel["z"]
         
     timeRefDif = timeRef2 - timeRef1
-    xValDif = xVal2 - xVal1
-    yValDif = yVal2 - yVal1
-    zValDif = zVal2 - zVal1
+    
+    xAvg = np.mean(xVals)
+    yAvg = np.mean(yVals)
+    zAvg = np.mean(zVals)
 
-    xVel = xValDif/timeRefDif
-    yVel = yValDif/timeRefDif
-    zVel = zValDif/timeRefDif
+    xVel = xAvg * timeRefDif
+    yVel = yAvg * timeRefDif
+    zVel = zAvg * timeRefDif
 
     if (xComp and yComp and zComp):
         return xVel, yVel, zVel

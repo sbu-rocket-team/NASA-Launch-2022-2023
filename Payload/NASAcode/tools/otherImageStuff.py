@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-from NASAcode.tools import img_functions as imgF
+#from NASAcode.tools import img_functions as imgF
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PARENT_DIR = os.path.dirname(SCRIPT_DIR) # Up one directory
@@ -52,7 +52,7 @@ def showImages(folderDir, join):
 
 
     
-showImages(SAVEDIMAGES_DIR, False)
+showImages(SAVEDIMAGES_DIR, True)
 
 imgN = os.path.join(TESTIMAGES_DIR, "field.jpg")
 imgD = os.path.join(TESTIMAGES_DIR, "fieldBlack.jpg")

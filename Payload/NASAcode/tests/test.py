@@ -231,10 +231,10 @@ def binaryOpeningSearch(img, start, middle, end, pThresh = 0.5):
 
         return binaryOpeningSearch(img, front, half, back)
 """
-a = tPO
-_, w = np.shape(a)
-a = binaryOpeningSearch(a, 1, w // 2, w)
-print(a)
+#a = tPO
+#_, w = np.shape(a)
+#a = binaryOpeningSearch(a, 1, w // 2, w)
+#print(a)
 
 row = 4
 col = 3
