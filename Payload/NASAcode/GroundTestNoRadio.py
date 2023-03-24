@@ -109,12 +109,14 @@ def executeInstructions(instructionList, timeOn):
 
             camF.takePic(imgName, directory = SAVEDIMAGES_DIR)
             txtF.writeFile(OUTPUTTEXT, imgName)
-
+            log.log(0,TARGET,"Taking photo")
+            
             img = cv2.imread(os.path.join(SAVEDIMAGES_DIR, imgName))
             img = imgF.processIMG(img, str(timeTaken), filterType, flipPic)
-
-            cv2.imwrite(os.path.join(SAVEDIMAGES_DIR, imgName), img)
             
+            cv2.imwrite(os.path.join(SAVEDIMAGES_DIR, imgName), img)
+            time.sleep(0.1)
+
             relCamRot = 0
             imgCount += 1
 
@@ -146,20 +148,24 @@ txtF.createFile(OUTPUTTEXT)
 while (not finishedTask):
     # get radio signal... read from txt file hopefully
     
-    instructions = radF.listen(5)
-    if len(instructions)==0:
-        log.log(2,TARGET, "Zero instructions found in radio output. Exiting.")
-        exit()
+    #instructions = [["A1", "C3", "A1", "C3", "A1", "C3", "A1", "C3", "A1", "C3", "A1", "C3"]]
+    instructions = [["C3", "B2", "C3", "A1", "C3"]]
+    instructions[0].reverse() # The .reverse() is originally from the instructions parser, but adding here in this file for easy command changes
+
+    # Not using the radio in this one, just testing sequences of commands
+    #instructions = radF.listen(5)
+    #if len(instructions)==0:
+    #    log.log(2,TARGET, "Zero instructions found in radio output. Exiting.")
+    #    exit()
 
     log.log(0,TARGET, "Executing instruction list: " + str(instructions[0]))
-    executeInstructions(instructions[0], timeOn)
+    executeInstructions(instructions[0], timeOn) 
     
     finishedTask = True
 
     timeOff = misF.timeElapsed(timeOn, time.time())
-    timeOff = "\nTotal Runtime is... " + timeOff
     log.log(0,TARGET,"End of commands, exiting. Total runtime: " + str(timeOff))
-    txtF.writeFile(OUTPUTTEXT, timeOff)
+    txtF.writeFile(OUTPUTTEXT, "Total Runtime is... " + timeOff)
 
 """
 while (not finishedTask):

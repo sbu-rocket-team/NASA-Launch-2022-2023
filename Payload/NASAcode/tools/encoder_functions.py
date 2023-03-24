@@ -63,7 +63,8 @@ Parameters:
 def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin = po.ENCODER, encoderMotorPhase = po.ROT_DIR, encoderMotorEnable = po.ROT_PWM):
     
     degree = degree % 360
-    log.log(0,TARGET,"Rotating " + str(direction) + " " + str(degree))
+    log.log(0,TARGET,"Rotating " + str(direction) + " " + str(degree) + ". Current angle: " + str(currentAngle))
+    
     
 
     global CPD
@@ -156,6 +157,7 @@ def rotateCam(direction, currentAngle, degree = 60, recall = False, encoderPin =
     readEncoder(po.ENCODER, reqCounter)
     motF.motorOff(po.ROT_PWM) # turn off motor
     log.log(0,TARGET,"Rotation completed, "+str(degree)+" degrees.")
+ 
     return returnDegree
 
 
@@ -174,3 +176,5 @@ def rotateTest():
     time.sleep(0.25)
 
     # and then should be back at zero again :)
+
+

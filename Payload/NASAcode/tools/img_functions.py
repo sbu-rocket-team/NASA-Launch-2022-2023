@@ -221,8 +221,16 @@ def testFilters():
    import time
    current_time = time.strftime("%H:%M:%S",time.localtime())   
    log.log(0,TARGET,"Running test suite of filters.")
-   img = cv2.imread(os.path.join("TestImages", "camTest.jpeg"))
-   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "N", True, 690)), processIMG(img,current_time,"N",True))
-   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "G", False, 691)), processIMG(img,current_time,"G"))
-   cv2.imwrite(os.path.join("TestImages", getImgName(str(current_time), "C", False, 692)), processIMG(img,current_time,"C"))
-   
+   img = cv2.imread(os.path.join("/home/pi/NASAcode/TestImages/", "camTest.jpg"))
+
+   name = getImgName(str(current_time), "N", True, 690)
+   cv2.imwrite(os.path.join("/home/pi/NASAcode/TestImages/", name), processIMG(img,current_time,"N",True))
+   log.log(0,TARGET, "Captured Test image " + str(name))
+
+   name = getImgName(str(current_time), "G", False, 691)
+   cv2.imwrite(os.path.join("/home/pi/NASAcode/TestImages/", name), processIMG(img,current_time,"G"))
+   log.log(0,TARGET, "Captured Test image " + str(name))
+
+   name = getImgName(str(current_time), "C", False, 692)
+   cv2.imwrite(os.path.join("/home/pi/NASAcode/TestImages/", name), processIMG(img,current_time,"C"))
+   log.log(0,TARGET, "Captured Test image " + str(name))

@@ -22,6 +22,8 @@ def listen(timeout = TIMEOUT, freq = FREQ, samples = SAMPLERATE, gain = GAIN):
     command = "/home/pi/NASAcode/radio/radio.sh " + str(int(timeout)) + " " + str(int(freq)) + " " + str(int(samples)) + " " + str(int(gain))
     subprocess.run([command],shell=True)
 
+    
+
     # output is saved to output.txt
     text = parse()
 
@@ -72,6 +74,3 @@ def parse():
                     
         
     return args_list
-
-
-parse()

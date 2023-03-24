@@ -29,7 +29,7 @@ def takePic(imgName, res = (1920,1080), directory = os.path.dirname(os.path.absp
 
 def camTest():
 
-    fileName = "camTest.jpeg"
-    destination = "TestImages"
+    fileName = "camTest.jpg"
+    destination = "/home/pi/NASAcode/TestImages"
 
     takePic(fileName,(2560,1440),destination)
