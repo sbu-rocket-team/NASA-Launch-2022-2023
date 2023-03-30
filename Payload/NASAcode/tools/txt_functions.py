@@ -5,6 +5,8 @@ Written By: Jewick Shi
 """
 import os
 
+import time
+
 def readFile(fileName):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)

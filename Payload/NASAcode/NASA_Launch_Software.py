@@ -56,6 +56,8 @@ OUTPUTTEXT = os.path.join(SCRIPT_DIR, "outputText.txt")
 ACCELOUTPUT = os.path.join(SCRIPT_DIR, "AccelData.txt")
 GYROOUTPUT = os.path.join(SCRIPT_DIR, "GyroData.txt")
 
+ACCELGYROOUTPUT = os.path.join(SCRIPT_DIR, "MPUOutputData.txt")
+
 # i forgor what these are for
 accelStart = None
 gryoStart = None
@@ -134,54 +136,98 @@ def executeInstructions(instructionList, timeOn):
             flipPic = False # I'm assuming this is condsidered a filter?
 
         listLen = len(tempList)
+
 """
+DOCUMENT
+"""
+def mpuInfoToSave(txtFile, duration, timeRelStart):
+    readIntervals = 0.5 # seconds
+    intervals = duration / readIntervals # number of intervals to read
+
+    counter = 0
+    while (counter < intervals):
+        Ax, Ay, Az = mpuF.getAccel()
+        Gx, Gy, Gz = mpuF.getGyro()
+        mpuInfo = "%a: %a, %a, %a, %a, %a, %a" %(time.time() - timeRelStart, Ax, Ay, Az, Gx, Gy, Gz)
+
+        txtF.writeFile(txtFile, mpuInfo)
+
+        counter += 1
+        time.sleep(readIntervals)
+
 #
 #main tasks
 timeOn = time.time()
-txtF.createFile(ACCELOUTPUT)
-txtF.createFile(GYROOUTPUT)
+#txtF.createFile(ACCELOUTPUT)
+#txtF.createFile(GYROOUTPUT)
+
+txtF.createFile(ACCELGYROOUTPUT)
 
 while (not (hasFlown & deployed)):
     if (not hasFlown):
         if (MIN_FALL_VELOCITY_TH > mpuF.getVel(zComp= True) >= MAX_FALL_VELOCITY_TH):
-            time.sleep(5)
+            #time.sleep(5)
+            mpuInfoToSave(ACCELGYROOUTPUT, 5, timeOn)
             if (MIN_FALL_VELOCITY_TH > mpuF.getVel(zComp= True) >= MAX_FALL_VELOCITY_TH):
                 hasFlown = True
-        time.sleep(2)
+                flownText = "hasFlown = True: " + misF.timeElapsed(timeOn, time.time()) + "\n"
+                txtF.writeFile(OUTPUTTEXT, flownText)
+        #time.sleep(2)
+        mpuInfoToSave(ACCELGYROOUTPUT, 2, timeOn)
     else:
+        mpuInfoToSave(ACCELGYROOUTPUT, 0.5, timeOn)
         accelMag, gryoMag = mpuF.getAccelGyroMagVal()
         if (MIN_ACCEL_TH <= accelMag <= MAX_ACCEL_TH) and (MIN_GYRO_TH <= gryoMag <= MAX_GYRO_TH):
+            openText = "Opened at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
+            txtF.writeFile(OUTPUTTEXT, openText)
             motF.moveLeadscrew("O")
 
             # insert camera deployment check 
             opened = True # camera deployment check function return
 
+            """
+            checkText = "Opening check at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
+            txtF.writeFile(OUTPUTTEXT, openText)
+
+            # camera check
+
+            checkText = "Can open? " + str(opened) + "\n"
+            txtF.writeFile(OUTPUTTEXT, openText)
+            """
+
             if (opened):
+                deployText = "Lifted at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
                 motF.moveRack("U")
-                deployText = "Lifted/Deployed at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
             else:
-                deployText = "Unlift/Deployed at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
+                deployText = "Not lifted at: " + misF.timeElapsed(timeOn, time.time()) + "\n"
 
             txtF.writeFile(OUTPUTTEXT, deployText)
             deployed = True
+        mpuInfoToSave(ACCELGYROOUTPUT, 4.5, timeOn)
 
 txtF.createFile(OUTPUTTEXT)
 
 while (hasFlown and deployed and (not finishedTask)):
-    # get radio signal... read from txt file hopefully
+    receivedText = "Recieving commands at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
+
+    # get radio signal... @Ethan add youre radio code here
     
-    instr1 = txtF.readFile(RADIOTEXT)
+    inStr = txtF.readFile(RADIOTEXT)
+    
+    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
+    #KQ4CTL C3 D4 A1 C3 G7 A1 A1 C3 A1 E5 C3 F6 C3 D4 A1 C3 G7 C3 A1 F6 E5 C3
     #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
-    receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
+    
     txtF.writeFile(OUTPUTTEXT, receivedText)
-    txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
+    txtF.writeFile(OUTPUTTEXT, (inStr + "\n"))
 
-    eventList1_1, eventList1_2 = instF.getInstructionList(instr1, CALLSIGN)
+    eventList1_1, eventList1_2 = instF.getInstructionList(inStr, CALLSIGN)
 
-    matching, differences = instF.compareInstructions(eventList1_1, eventList1_2)
+    matching, differences, invalid1, invalid2 = instF.compareInstructions(eventList1_1, eventList1_2)
 
-    if (matching and (differences <= 2)):
-        executeList = eventList1_1
+    #if (matching and (differences <= 2)):
+    if (matching):
+        executeList = instF.mergeInstructions(eventList1_1, eventList1_2, invalid1, invalid2)
 
         executeInstructions(executeList, timeOn)
     
@@ -191,8 +237,9 @@ while (hasFlown and deployed and (not finishedTask)):
         timeOff = "\nTotal Runtime is... " + timeOff
         txtF.writeFile(OUTPUTTEXT, timeOff)
 #
-"""
 
+
+"""
 timeOn = time.time()
 txtF.createFile(OUTPUTTEXT)
 
@@ -242,9 +289,6 @@ while (not finishedTask):
     #motF.moveRack("D", 0.5)
     
     instr1 = txtF.readFile(RADIOTEXT)
-    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 F6 E5 C3
-    #KQ4CTL C3 D4 A1 C3 G7 A1 A1 C3 A1 E5 C3 F6 C3 D4 A1 C3 G7 C3 A1 F6 E5 C3
-    #KQ4CTL C3 D4 C3 G7 C3 E5 C3 F6 C3 D4 C3 G7 C3 E5 A1 C3 A1 C3 A1 C3 A1 C3 B2 C3 B2 C3 B2 C3 B2 C3 B2 C3 C3 B2 C3 B2 C3 A1 C3 A1 C3 A1 C3 A1 C3
     receivedText = "Command received at... " + misF.timeElapsed(timeOn, time.time()) + "\n"
     txtF.writeFile(OUTPUTTEXT, receivedText)
     txtF.writeFile(OUTPUTTEXT, (instr1 + "\n"))
@@ -260,6 +304,8 @@ while (not finishedTask):
     timeOff = misF.timeElapsed(timeOn, time.time())
     timeOff = "\nTotal Runtime is... " + timeOff
     txtF.writeFile(OUTPUTTEXT, timeOff)
+"""
+
 """
     # what if record for 8 mins... get 3 readings
     # compare the 3 readings

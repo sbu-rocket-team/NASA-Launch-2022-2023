@@ -15,7 +15,7 @@ def getInstructionList(inString, callSign):
     
     tempList = tempStr.rsplit(" ")
 
-    callSignList = [i for i in tempList if len(i) > 2]
+    callSignList = [i for i in tempList if len(i) == 6] # originally len(i)> 2
 
     nextCall = callSignList[callSignList.index(callSign)+1]
     
@@ -51,15 +51,41 @@ need to improve maybe do 3?
 # if not the same, get signal again and compare again
 """
 def compareInstructions(inList1, inList2):
+    commandList = ["A1", "B2", "C3", "D4", "E5", "F6", "G7", "H8"]
     matching = True
     differences = 0
+    invalid1 = 0
+    invalid2 = 0
     if (len(inList1) == len(inList2)) and (len(inList1) != 0):
         for i in range(len(inList1)):
-            if inList1[i].upper() != inList2[i].upper():
+            if (inList1[i].upper() != inList2[i].upper()):
                 matching = False
                 differences += 1
+
+                if any(x != inList1[i] for x in commandList):
+                    invalid1 += 1
+                if any(x != inList2[i] for x in commandList):
+                    invalid2 += 1
+
+            
     else:
         matching = False
         differences = -1
 
-    return matching, differences
+    return matching, differences, invalid1, invalid2
+
+def mergeInstructions(inList1, inList2, invalid1, invalid2):
+    commandList = ["A1", "B2", "C3", "D4", "E5", "F6", "G7", "H8"]
+    returnList = []
+
+    for i in range(len(inList1)):
+            if (inList1[i].upper() == inList2[i].upper()):
+                returnList.append(inList1[i])
+            elif any(x == inList1[i] for x in commandList):
+                if ((invalid1 < invalid2) or any(x != inList2[i] for x in commandList)):
+                    returnList.append(inList1[i])
+            elif any(x == inList2[i] for x in commandList):
+                if (invalid2 < invalid1 or any(x != inList1[i] for x in commandList)):
+                    returnList.append(inList2[i])
+
+    return returnList
