@@ -1,7 +1,14 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 import txt_functions as txtF
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PARENT_DIR = os.path.dirname(SCRIPT_DIR) # Up one directory
+
+OUTPUTFILE = os.path.join(PARENT_DIR, "MPUOutputData.txt")
 
 def plotData(txtFile):
     dataStr = txtF.readFile(txtFile)
@@ -108,3 +115,5 @@ def plotData(txtFile):
     plt.legend()
 
     plt.show()
+
+plotData(OUTPUTFILE)

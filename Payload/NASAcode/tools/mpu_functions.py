@@ -158,6 +158,53 @@ def getVel(xComp=True, yComp=True, zComp=True, dt=1):
         return zVel
     else:
         return None
+    
+def getVel2(xComp=True, yComp=True, zComp=True, dt=1):
+    Ax = []
+    Ay = []
+    Az = []
+    t = []
+
+    accel = MPU.get_accel_data()
+    t.append(time.time())
+    Ax.append(accel["x"])
+    Ay.append(accel["y"])
+    Az.append(accel["z"])
+    time.sleep(dt)
+    
+    accel = MPU.get_accel_data()
+    t.append(time.time())
+    Ax.append(accel["x"])
+    Ay.append(accel["y"])
+    Az.append(accel["z"])
+    
+    Vx = np.zeros_like(t)
+    Vy = np.zeros_like(t)
+    Vz = np.zeros_like(t)
+    for i in range(1, len(t)):
+        Vx[i] = np.trapz(Ax[:i+1], t[:i+1])
+        Vy[i] = np.trapz(Ay[:i+1], t[:i+1])
+        Vz[i] = np.trapz(Az[:i+1], t[:i+1])
+
+    xVel = Vx[1]
+    yVel = Vy[1]
+    zVel = Vz[1]
+    if (xComp and yComp and zComp):
+        return xVel, yVel, zVel
+    elif (xComp and yComp):
+        return xVel, yVel
+    elif (xComp and zComp):
+        return xVel, zVel
+    elif (yComp and zComp):
+        return yVel, zVel
+    elif (xComp):
+        return xVel
+    elif (yComp):
+        return yVel
+    elif (zComp):
+        return zVel
+    else:
+        return None
 
 """
 Gets the component angular change. Returns any combination of the three axis.

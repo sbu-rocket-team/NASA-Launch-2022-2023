@@ -92,12 +92,3 @@ def mergeInstructions(inList1, inList2, invalid1, invalid2):
                     returnList.append(inList2[i])
 
     return returnList
-
-
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-OUTPUTTEXT = os.path.join(SCRIPT_DIR, "output.txt")
-
-toStr = tf.readFile(OUTPUTTEXT)
-print(toStr.rsplit(" "))
