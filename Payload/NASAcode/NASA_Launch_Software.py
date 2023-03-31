@@ -141,7 +141,7 @@ def executeInstructions(instructionList, timeOn):
 DOCUMENT
 """
 def mpuInfoToSave(txtFile, duration, timeRelStart):
-    readIntervals = 0.5 # seconds
+    readIntervals = 0.1 # seconds
     intervals = duration / readIntervals # number of intervals to read
 
     counter = 0
