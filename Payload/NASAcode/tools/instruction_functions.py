@@ -9,6 +9,9 @@ need to add in
 gets 2 instructions out of the radio signal...
 6 mins record to guarntee at least 2 readings... best case 3 full proper, avg case 2 full 1 partial
 """
+import os
+import txt_functions as tf
+
 def getInstructionList(inString, callSign):
     tempStr = inString[:]
     tempStr = tempStr.upper()
@@ -89,3 +92,12 @@ def mergeInstructions(inList1, inList2, invalid1, invalid2):
                     returnList.append(inList2[i])
 
     return returnList
+
+
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+OUTPUTTEXT = os.path.join(SCRIPT_DIR, "output.txt")
+
+toStr = tf.readFile(OUTPUTTEXT)
+print(toStr.rsplit(" "))

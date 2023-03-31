@@ -148,7 +148,7 @@ def mpuInfoToSave(txtFile, duration, timeRelStart):
     while (counter < intervals):
         Ax, Ay, Az = mpuF.getAccel()
         Gx, Gy, Gz = mpuF.getGyro()
-        mpuInfo = "%a: %a, %a, %a, %a, %a, %a" %(time.time() - timeRelStart, Ax, Ay, Az, Gx, Gy, Gz)
+        mpuInfo = "%a: %a, %a, %a, %a, %a, %a;" %(time.time() - timeRelStart, Ax, Ay, Az, Gx, Gy, Gz)
 
         txtF.writeFile(txtFile, mpuInfo)
 

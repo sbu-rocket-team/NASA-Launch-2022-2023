@@ -5,8 +5,6 @@ Written By: Jewick Shi
 """
 import os
 
-import time
-
 def readFile(fileName):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
@@ -18,7 +16,7 @@ def readFile(fileName):
 
     return fileData
 
-def createFile(fileName,header = "SBU Rocket Team records.\n\n"):
+def createFile(fileName,header = "SBU Rocket Team records...\n\n"):
     file_dir = os.path.dirname(os.path.abspath(__file__))
     fileLoc = os.path.join(file_dir, fileName)
 
